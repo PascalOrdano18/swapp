@@ -171,3 +171,20 @@
 .group:hover .glow-hover::before {
   opacity: 1;
 }
+
+/* Add floating animation for glowing balls */
+@keyframes float {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  50% {
+    transform: translateY(-20px) translateX(10px);
+  }
+  100% {
+    transform: translateY(0) translateX(0);
+  }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}

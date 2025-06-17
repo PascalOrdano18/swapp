@@ -65,57 +65,57 @@ export default function FeaturedGrid() {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-2 md:px-0">
       {items.map((item) => (
         <div
           key={item.id}
-          className="group relative overflow-hidden rounded-2xl bg-white border hover:shadow-xl transition-all duration-300"
+          className="group relative overflow-hidden rounded-3xl bg-white/30 backdrop-blur-md border border-white/20 shadow-none hover:shadow-lg hover:scale-[1.025] transition-all duration-300 flex flex-col"
+          style={{ minHeight: 380 }}
         >
-          <div className="relative aspect-square overflow-hidden">
-            <Link href={`/items/${item.id}`}>
+          <div className="relative aspect-[4/5] overflow-hidden flex items-center justify-center">
+            <Link href={`/items/${item.id}`} className="block w-full h-full">
               <Image
                 src={item.image || "/placeholder.svg"}
                 alt={item.title}
                 fill
-                className="object-cover transition-transform group-hover:scale-105"
+                className="object-cover transition-transform group-hover:scale-105 rounded-2xl"
+                style={{ borderRadius: 18 }}
               />
             </Link>
-
             {/* AI Badge */}
-            <div className="absolute top-3 left-3">
+            <div className="absolute top-4 left-4">
               <span
-                className={`px-2 py-1 rounded-full text-xs font-medium ${
+                className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm bg-white/70 backdrop-blur text-gray-800 border border-white/40 ${
                   item.aiPrice === "Fast Sell"
-                    ? "bg-red-100 text-red-700"
+                    ? "ring-2 ring-red-400"
                     : item.aiPrice === "Hold"
-                      ? "bg-green-100 text-green-700"
-                      : "bg-blue-100 text-blue-700"
+                    ? "ring-2 ring-green-400"
+                    : "ring-2 ring-blue-400"
                 }`}
               >
                 {item.aiPrice}
               </span>
             </div>
-
             {/* Heart Button */}
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-3 right-3 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white"
+              className="absolute top-4 right-4 rounded-full bg-white/60 hover:bg-white/90 backdrop-blur border border-white/40 shadow-sm"
               onClick={() => toggleFavorite(item.id)}
+              style={{ boxShadow: '0 2px 12px 0 rgba(0,0,0,0.04)' }}
             >
               <Heart
-                className={`h-4 w-4 ${favorites.includes(item.id) ? "fill-red-500 text-red-500" : "text-gray-600"}`}
+                className={`h-5 w-5 transition-colors ${favorites.includes(item.id) ? "fill-red-500 text-red-500" : "text-gray-400"}`}
               />
             </Button>
           </div>
-
-          <div className="p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-500 font-medium">{item.brand}</span>
-              <span className="text-lg font-black">${item.price}</span>
+          <div className="flex-1 flex flex-col justify-end p-5">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-gray-500 font-medium tracking-wide uppercase">{item.brand}</span>
+              <span className="text-xl font-extrabold text-gray-900 drop-shadow-sm">${item.price}</span>
             </div>
             <Link href={`/items/${item.id}`}>
-              <h3 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors line-clamp-1">
+              <h3 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors text-lg line-clamp-1 tracking-tight">
                 {item.title}
               </h3>
             </Link>
