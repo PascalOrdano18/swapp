@@ -4,9 +4,8 @@ import type React from "react"
 
 import Link from "next/link"
 import Image from "next/image"
-import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Plus, User, ArrowRight, LogOut, Settings } from "lucide-react"
+import { Search, Plus, User, LogOut, Settings } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
@@ -18,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import PrimaryButton from "@/components/PrimaryButton"
 
 export default function Navbar() {
   const router = useRouter()
@@ -234,31 +234,31 @@ export default function Navbar() {
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
               {/* Sell Button */}
               <Link href="/upload">
-                <Button
-                  size="sm"
-                  className="group relative overflow-hidden rounded-full bg-white text-violet-900 hover:bg-violet-50 transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-violet-200/40 px-6 h-10 border border-violet-100"
-                >
-                  <div className="absolute inset-0 bg-gradient-to-r from-violet-200 to-violet-100 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  <Plus className="h-4 w-4 mr-2 relative z-10 transition-transform duration-300 group-hover:rotate-180 text-violet-700" />
-                  <span className="relative z-10 font-medium text-sm">Vender</span>
-                </Button>
+                <PrimaryButton size="sm">
+                  <Plus className="h-4 w-4 mr-2" />
+                  Vender
+                </PrimaryButton>
               </Link>
 
               {/* Auth Buttons */}
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
+                    <button
                       className="group relative rounded-full w-10 h-10 bg-white text-violet-700 hover:bg-violet-50 transition-all duration-300 hover:scale-110 border border-violet-100"
                     >
-                      <User className="h-5 w-5 text-violet-400 transition-all duration-300 group-hover:text-violet-700 group-hover:scale-110" />
-                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-100/40 to-violet-200/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                    </Button>
+                      <div 
+                        className="absolute -inset-2 rounded-full z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
+                        style={{
+                          background: 'radial-gradient(circle, rgba(168, 85, 247, 0.7) 0%, rgba(139, 92, 246, 0.3) 100%)',
+                          filter: 'blur(12px)'
+                        }}
+                      />
+                      <User className="relative z-10 h-5 w-5 mx-auto text-violet-400 transition-all duration-300 group-hover:text-violet-700 group-hover:scale-110" />
+                    </button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" className="w-56 bg-white/95 backdrop-blur-md border border-violet-100">
                     <div className="px-3 py-2">
@@ -289,13 +289,9 @@ export default function Navbar() {
                 </DropdownMenu>
               ) : (
                 <Link href="/auth">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="group relative rounded-full bg-white text-violet-700 hover:bg-violet-50 transition-all duration-300 hover:scale-105 border border-violet-100 px-4"
-                  >
-                    <span className="font-medium text-sm">Iniciar Sesión</span>
-                  </Button>
+                  <PrimaryButton size="sm">
+                    Iniciar Sesión
+                  </PrimaryButton>
                 </Link>
               )}
             </div>

@@ -1,7 +1,7 @@
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
 import { ArrowRight } from "lucide-react"
 import FeaturedGrid from "@/components/featured-grid"
+import PrimaryButton from "@/components/PrimaryButton"
 
 export default function Home() {
   // Generate random positions for glowing balls on every render
@@ -80,24 +80,14 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4 items-center">
             <Link href="/feed">
-              <div className="relative group">
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{width: 180, height: 72}}>
-                  <div style={{width: '100%', height: '100%', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(139,92,246,0.45) 0%, rgba(168,85,247,0.25) 100%)', filter: 'blur(18px)'}} />
-                </div>
-                <Button size="lg" className="relative rounded-full bg-white text-black hover:bg-gray-100 hover:scale-105 px-8 transition-all duration-300 z-10">
-                  <span className="flex items-center">Explorar<ArrowRight className="ml-2 h-4 w-4" /></span>
-                </Button>
-              </div>
+              <PrimaryButton>
+                <span className="flex items-center">Explorar<ArrowRight className="ml-2 h-4 w-4" /></span>
+              </PrimaryButton>
             </Link>
             <Link href="/upload">
-              <div className="relative group">
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{width: 180, height: 72}}>
-                  <div style={{width: '100%', height: '100%', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(139,92,246,0.45) 0%, rgba(168,85,247,0.25) 100%)', filter: 'blur(18px)'}} />
-                </div>
-                <Button size="lg" variant="outline" className="relative rounded-full border-white text-black hover:bg-white hover:text-black hover:scale-105 px-8 transition-all duration-300 z-10">
-                  <span>Vender</span>
-                </Button>
-              </div>
+              <PrimaryButton>
+                Vender
+              </PrimaryButton>
             </Link>
           </div>
         </div>
@@ -124,14 +114,9 @@ export default function Home() {
               Únete al marketplace de streetwear más inteligente. Vende más rápido con precios de IA.
             </p>
             <Link href="/upload">
-              <div className="relative group">
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" style={{width: 180, height: 72}}>
-                  <div style={{width: '100%', height: '100%', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(139,92,246,0.45) 0%, rgba(168,85,247,0.25) 100%)', filter: 'blur(18px)'}} />
-                </div>
-                <Button size="lg" className="relative rounded-full bg-white text-black hover:bg-gray-100 hover:scale-105 px-8 transition-all duration-300 z-10">
-                  Lista tu Primer Artículo
-                </Button>
-              </div>
+              <PrimaryButton>
+                Lista tu Primer Artículo
+              </PrimaryButton>
             </Link>
           </div>
         </section>
