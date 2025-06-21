@@ -122,13 +122,13 @@ export default function UploadPage() {
       for (const photo of photos) {
         const filePath = `${user.id}/${newItemId}/${Date.now()}-${photo.name}`
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('item_images')
+          .from('item-images')
           .upload(filePath, photo)
         
         if (uploadError) throw new Error(`Error uploading image: ${uploadError.message}`)
 
         const { data: urlData } = supabase.storage
-          .from('item_images')
+          .from('item-images')
           .getPublicUrl(filePath)
         
         uploadedImageUrls.push(urlData.publicUrl)

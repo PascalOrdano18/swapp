@@ -1,37 +1,46 @@
 import Image from "next/image"
+import { notFound } from "next/navigation"
 import { MessageCircle } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { createClient } from "@/lib/supabase/server"
+import ImageGallery from "@/components/ImageGallery"
 
-const item = {
-  id: "1",
-  title: "Supreme Box Logo Hoodie",
-  price: 450,
-  images: [
-    "/placeholder.svg?height=600&width=600",
-    "/placeholder.svg?height=600&width=600&text=Image+2",
-    "/placeholder.svg?height=600&width=600&text=Image+3",
-  ],
-  seller: {
-    username: "streetwear_king",
-    rating: 4.9,
-    avatar: "/placeholder.svg?height=100&width=100",
-  },
-  brand: "Supreme",
-  size: "L",
-  condition: "Like New",
-  aiRecommendation: "Fast Sell",
-  description:
-    "Authentic Supreme Box Logo Hoodie from FW21 collection. Worn only a few times, in excellent condition with no flaws. Classic black colorway with red box logo. Ships with original packaging and receipt.",
-  details: {
-    color: "Black",
-    material: "Cotton",
-    release: "FW21",
-    style: "Box Logo",
-  },
+// This tells Next.js not to cache this page, so we always get fresh data.
+export const revalidate = 0
+
+interface ImageRecord {
+  image_url: string;
+  is_primary: boolean;
 }
 
-export default function ItemPage() {
+export default async function ItemPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
+  const supabase = await createClient()
+
+  // Fetch the item data including related seller (profiles) and images (item_images)
+  const { data: item } = await supabase
+    .from('items')
+    .select(`
+      *,
+      profiles (
+        username,
+        avatar_url,
+        rating
+      ),
+      item_images (
+        image_url,
+        is_primary
+      )
+    `)
+    .eq('id', id)
+    .single()
+
+  // If no item is found, show a 404 page
+  if (!item) {
+    notFound()
+  }
+
   return (
     <div className="min-h-screen bg-black flex justify-center items-start py-16 px-4 mt-20 relative overflow-hidden">
       {/* Magical background glows */}
@@ -40,30 +49,16 @@ export default function ItemPage() {
       
       <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-16 z-10">
         {/* Left: Images */}
-        <div className="flex flex-col gap-4 items-center">
-          <div className="w-full aspect-square bg-white/10 rounded-2xl overflow-hidden flex items-center justify-center border border-white/20">
-            <Image
-              src={item.images[0]}
-              alt={item.title}
-              width={600}
-              height={600}
-              className="object-cover w-full h-full"
-            />
-          </div>
-          <div className="flex gap-3 w-full justify-center">
-            {item.images.slice(1).map((img, i) => (
-              <div key={i} className="w-20 h-20 rounded-xl overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center">
-                <Image src={img} alt={item.title + ' thumb'} width={80} height={80} className="object-cover w-full h-full" />
-              </div>
-            ))}
-          </div>
-        </div>
+        <ImageGallery images={item.item_images} title={item.title} />
+
         {/* Right: Info */}
         <div className="flex flex-col gap-6 justify-start w-full max-w-md mx-auto">
           {/* Brand badge */}
-          <div className="flex items-center gap-2">
-            <Badge className="bg-gradient-to-r from-blue-400 to-purple-400 text-white px-3 py-1 text-xs font-medium shadow-lg border-none">{item.aiRecommendation}</Badge>
-          </div>
+          {item.ai_recommendation && (
+            <div className="flex items-center gap-2">
+              <Badge className="bg-gradient-to-r from-blue-400 to-purple-400 text-white px-3 py-1 text-xs font-medium shadow-lg border-none">{item.ai_recommendation}</Badge>
+            </div>
+          )}
           {/* Title & Price */}
           <div>
             <h1 className="text-3xl font-extrabold text-white mb-2 leading-tight">{item.title}</h1>
@@ -71,9 +66,9 @@ export default function ItemPage() {
           </div>
           {/* Key Info */}
           <div className="flex flex-wrap gap-2 mb-2">
-            <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1 text-sm font-medium text-white/80">{item.brand}</span>
-            <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1 text-sm font-medium text-white/80">{item.size}</span>
-            <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1 text-sm font-medium text-white/80">{item.condition}</span>
+            {item.brand && <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1 text-sm font-medium text-white/80">{item.brand}</span>}
+            {item.size && <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1 text-sm font-medium text-white/80">{item.size}</span>}
+            {item.condition && <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1 text-sm font-medium text-white/80">{item.condition}</span>}
           </div>
           {/* Buttons */}
           <div className="flex gap-3 mb-2">
@@ -83,15 +78,22 @@ export default function ItemPage() {
             </button>
           </div>
           {/* Seller Card */}
-          <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 border border-white/20">
-            <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-purple-400">
-              <Image src={item.seller.avatar} alt={item.seller.username} fill className="object-cover" />
+          {item.profiles && (
+            <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 border border-white/20">
+              <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-purple-400">
+                <Image 
+                  src={item.profiles.avatar_url || "/placeholder.svg?height=100&width=100"} 
+                  alt={item.profiles.username || 'Seller Avatar'} 
+                  fill 
+                  className="object-cover" 
+                />
+              </div>
+              <div className="flex flex-col justify-center">
+                <span className="font-semibold text-white text-sm">{item.profiles.username || 'Anonymous Seller'}</span>
+                <span className="text-xs text-white/60">{item.profiles.rating || 0} ★</span>
+              </div>
             </div>
-            <div className="flex flex-col justify-center">
-              <span className="font-semibold text-white text-sm">{item.seller.username}</span>
-              <span className="text-xs text-white/60">{item.seller.rating} ★</span>
-            </div>
-          </div>
+          )}
           {/* Description & Details */}
           <div className="rounded-2xl p-6 bg-white/10 border border-white/20">
             <Tabs defaultValue="description">
@@ -104,12 +106,9 @@ export default function ItemPage() {
               </TabsContent>
               <TabsContent value="details" className="mt-2">
                 <div className="space-y-2">
-                  {Object.entries(item.details).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-2 text-sm border-b border-white/10 last:border-none">
-                      <span className="font-medium capitalize text-white/60">{key}</span>
-                      <span className="text-white/90">{value}</span>
-                    </div>
-                  ))}
+                  {item.brand && <div className="flex justify-between py-2 text-sm border-b border-white/10"><span className="font-medium capitalize text-white/60">Brand</span><span className="text-white/90">{item.brand}</span></div>}
+                  {item.size && <div className="flex justify-between py-2 text-sm border-b border-white/10"><span className="font-medium capitalize text-white/60">Size</span><span className="text-white/90">{item.size}</span></div>}
+                  {item.condition && <div className="flex justify-between py-2 text-sm border-b border-white/10 last:border-none"><span className="font-medium capitalize text-white/60">Condition</span><span className="text-white/90">{item.condition}</span></div>}
                 </div>
               </TabsContent>
             </Tabs>

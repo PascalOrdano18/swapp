@@ -3,6 +3,7 @@
 import type React from "react"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Search, Plus, User, ArrowRight, LogOut, Settings } from "lucide-react"
@@ -24,21 +25,8 @@ export default function Navbar() {
   const [isSearchActive, setIsSearchActive] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isScrolled, setIsScrolled] = useState(false)
-  const [searchResults, setSearchResults] = useState<Array<{ id: number; title: string }>>([])
+  const [searchResults, setSearchResults] = useState<Array<{ id: string; title: string }>>([])
   const searchInputRef = useRef<HTMLInputElement>(null)
-
-  // Mock items data - in a real app, this would come from an API or database
-  const items = [
-    { id: 1, title: "Supreme Box Logo Hoodie" },
-    { id: 2, title: "Nike SB Dunk Low Travis Scott" },
-    { id: 3, title: "Bape Camo Shark Hoodie" },
-    { id: 4, title: "Off-White Industrial Belt" },
-    { id: 5, title: "Palace Tri-Ferg T-Shirt" },
-    { id: 6, title: "Yeezy Boost 350 V2 Zebra" },
-    { id: 7, title: "Chrome Hearts Hoodie" },
-    { id: 8, title: "Fear of God Essentials Sweatpants" },
-    { id: 9, title: "Jordan 1 Retro High OG Chicago" },
-  ]
 
   useEffect(() => {
     const handleScroll = () => {
@@ -50,10 +38,15 @@ export default function Navbar() {
 
   useEffect(() => {
     if (searchQuery.trim()) {
-      const results = items.filter(item =>
-        item.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-      setSearchResults(results)
+      // Fetch real search results from the API
+      const controller = new AbortController()
+      fetch(`/api/search?q=${encodeURIComponent(searchQuery)}`, { signal: controller.signal })
+        .then(res => res.json())
+        .then(data => {
+          setSearchResults(Array.isArray(data) ? data : [])
+        })
+        .catch(() => setSearchResults([]))
+      return () => controller.abort()
     } else {
       setSearchResults([])
     }
@@ -80,7 +73,7 @@ export default function Navbar() {
     }
   }
 
-  const handleResultClick = (itemId: number) => {
+  const handleResultClick = (itemId: string) => {
     router.push(`/items/${itemId}`)
     setIsSearchActive(false)
     setSearchQuery("")
@@ -113,10 +106,10 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" className="group relative z-10 flex items-center">
               <span className="relative flex items-center">
-                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300" style={{width: 120, height: 56}}>
+                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out" style={{width: 120, height: 56}}>
                   <span style={{width: '100%', height: '100%', borderRadius: 56, background: 'radial-gradient(circle, rgba(139,92,246,0.7) 0%, rgba(168,85,247,0.35) 100%)', filter: 'blur(24px)'}} />
                 </span>
-                <span className="text-2xl font-black tracking-[-0.02em] text-white transition-all duration-300">SWAPP</span>
+                <Image src="/logo.png" alt="Swapp Logo" width={100} height={40} className="transition-all duration-300 group-hover:scale-105" />
               </span>
             </Link>
 

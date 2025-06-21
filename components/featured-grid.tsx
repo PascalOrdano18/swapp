@@ -1,67 +1,78 @@
-"use client"
-
-import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { createClient } from "@/lib/supabase/server"
 
-const items = [
-  {
-    id: 1,
-    title: "Supreme Box Logo Hoodie",
-    price: 450,
-    image: "/placeholder.svg?height=400&width=300",
-    brand: "Supreme",
-    aiPrice: "Fast Sell",
-  },
-  {
-    id: 2,
-    title: "Travis Scott Jordan 1",
-    price: 1200,
-    image: "/placeholder.svg?height=400&width=300",
-    brand: "Nike",
-    aiPrice: "Hold",
-  },
-  {
-    id: 3,
-    title: "Bape Shark Hoodie",
-    price: 320,
-    image: "/placeholder.svg?height=400&width=300",
-    brand: "Bape",
-    aiPrice: "Standard",
-  },
-  {
-    id: 4,
-    title: "Off-White Belt",
-    price: 180,
-    image: "/placeholder.svg?height=400&width=300",
-    brand: "Off-White",
-    aiPrice: "Fast Sell",
-  },
-  {
-    id: 5,
-    title: "Palace Tri-Ferg Tee",
-    price: 95,
-    image: "/placeholder.svg?height=400&width=300",
-    brand: "Palace",
-    aiPrice: "Standard",
-  },
-  {
-    id: 6,
-    title: "Yeezy 350 Zebra",
-    price: 320,
-    image: "/placeholder.svg?height=400&width=300",
-    brand: "Adidas",
-    aiPrice: "Hold",
-  },
-]
+// Re-render this page every time it's visited
+export const revalidate = 0
 
-export default function FeaturedGrid() {
-  const [favorites, setFavorites] = useState<number[]>([])
+// Define the type for our featured item
+type FeaturedItem = {
+  id: string;
+  title: string;
+  price: number;
+  brand: string | null;
+  ai_recommendation: string | null;
+  image: string;
+}
 
-  const toggleFavorite = (id: number) => {
-    setFavorites((prev) => (prev.includes(id) ? prev.filter((fav) => fav !== id) : [...prev, id]))
+async function getFeaturedItems() {
+  const supabase = await createClient()
+  
+  // Get the most recent items, prioritizing those with "Fast Sell" recommendations
+  const { data, error } = await supabase
+    .from('items')
+    .select(`
+      id,
+      title,
+      price,
+      brand,
+      ai_recommendation,
+      item_images (
+        image_url,
+        is_primary
+      )
+    `)
+    .eq('status', 'active')
+    .order('ai_recommendation', { ascending: false }) // "Fast Sell" comes first alphabetically
+    .order('created_at', { ascending: false })
+    .limit(6) // Show 6 featured items
+
+  if (error) {
+    console.error("Error fetching featured items:", error)
+    return []
+  }
+  
+  // For each item, find the primary image
+  const itemsWithPrimaryImage = data.map(item => {
+    const primaryImageObj = item.item_images.find(img => img.is_primary);
+    const primaryImage = primaryImageObj?.image_url || item.item_images[0]?.image_url;
+
+    return {
+      ...item,
+      image: primaryImage || "/placeholder.svg?height=400&width=300"
+    }
+  })
+
+  return itemsWithPrimaryImage
+}
+
+export default async function FeaturedGrid() {
+  const items = await getFeaturedItems()
+
+  // If no items, show a placeholder message
+  if (items.length === 0) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-gray-400 text-lg">No items available yet. Be the first to list something!</p>
+        <Link href="/upload">
+          <Button className="mt-4 rounded-full bg-white text-black hover:bg-gray-100">
+            List Your First Item
+          </Button>
+        </Link>
+      </div>
+    )
   }
 
   return (
@@ -75,7 +86,7 @@ export default function FeaturedGrid() {
           <div className="relative aspect-[4/5] overflow-hidden flex items-center justify-center">
             <Link href={`/items/${item.id}`} className="block w-full h-full">
               <Image
-                src={item.image || "/placeholder.svg"}
+                src={item.image}
                 alt={item.title}
                 fill
                 className="object-cover transition-transform group-hover:scale-105 rounded-2xl"
@@ -83,35 +94,34 @@ export default function FeaturedGrid() {
               />
             </Link>
             {/* AI Badge */}
-            <div className="absolute top-4 left-4">
-              <span
-                className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm bg-white/70 backdrop-blur text-gray-800 border border-white/40 ${
-                  item.aiPrice === "Fast Sell"
-                    ? "ring-2 ring-red-400"
-                    : item.aiPrice === "Hold"
-                    ? "ring-2 ring-green-400"
-                    : "ring-2 ring-blue-400"
-                }`}
-              >
-                {item.aiPrice === "Fast Sell" ? "Venta Rápida" : item.aiPrice === "Hold" ? "Esperar" : "Estándar"}
-              </span>
-            </div>
-            {/* Heart Button */}
+            {item.ai_recommendation && (
+              <div className="absolute top-4 left-4">
+                <span
+                  className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm bg-white/70 backdrop-blur text-gray-800 border border-white/40 ${
+                    item.ai_recommendation === "Fast Sell"
+                      ? "ring-2 ring-red-400"
+                      : item.ai_recommendation === "Hold"
+                      ? "ring-2 ring-green-400"
+                      : "ring-2 ring-blue-400"
+                  }`}
+                >
+                  {item.ai_recommendation === "Fast Sell" ? "Venta Rápida" : item.ai_recommendation === "Hold" ? "Esperar" : "Estándar"}
+                </span>
+              </div>
+            )}
+            {/* Heart Button (dummy functionality) */}
             <Button
               variant="ghost"
               size="icon"
               className="absolute top-4 right-4 rounded-full bg-white/60 hover:bg-white/90 backdrop-blur border border-white/40 shadow-sm"
-              onClick={() => toggleFavorite(item.id)}
               style={{ boxShadow: '0 2px 12px 0 rgba(0,0,0,0.04)' }}
             >
-              <Heart
-                className={`h-5 w-5 transition-colors ${favorites.includes(item.id) ? "fill-red-500 text-red-500" : "text-gray-400"}`}
-              />
+              <Heart className="h-5 w-5 transition-colors text-gray-400" />
             </Button>
           </div>
           <div className="flex-1 flex flex-col justify-end p-5">
             <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-500 font-medium tracking-wide uppercase">{item.brand}</span>
+              <span className="text-xs text-gray-500 font-medium tracking-wide uppercase">{item.brand || 'Unknown Brand'}</span>
               <span className="text-xl font-extrabold text-gray-900 drop-shadow-sm">${item.price}</span>
             </div>
             <Link href={`/items/${item.id}`}>
@@ -124,4 +134,4 @@ export default function FeaturedGrid() {
       ))}
     </div>
   )
-}
+} 

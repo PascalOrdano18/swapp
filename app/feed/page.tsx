@@ -1,5 +1,4 @@
 import { Suspense } from "react"
-import FeedGrid from "@/components/feed-grid"
 import FeedFilters from "@/components/feed-filters"
 
 export default function FeedPage() {
