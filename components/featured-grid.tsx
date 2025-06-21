@@ -1,6 +1,5 @@
 import Link from "next/link"
 import Image from "next/image"
-import { Heart } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/server"
 
@@ -109,15 +108,6 @@ export default async function FeaturedGrid() {
                 </span>
               </div>
             )}
-            {/* Heart Button (dummy functionality) */}
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute top-4 right-4 rounded-full bg-white/60 hover:bg-white/90 backdrop-blur border border-white/40 shadow-sm"
-              style={{ boxShadow: '0 2px 12px 0 rgba(0,0,0,0.04)' }}
-            >
-              <Heart className="h-5 w-5 transition-colors text-gray-400" />
-            </Button>
           </div>
           <div className="flex-1 flex flex-col justify-end p-5">
             <div className="flex items-center justify-between mb-1">

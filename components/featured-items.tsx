@@ -1,12 +1,9 @@
 "use client"
 
-import { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Heart } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import { Clock } from "lucide-react" // Import Clock component
 
 // Mock data for featured items
@@ -58,16 +55,6 @@ const featuredItems = [
 ]
 
 export default function FeaturedItems() {
-  const [favorites, setFavorites] = useState<number[]>([])
-
-  const toggleFavorite = (id: number) => {
-    if (favorites.includes(id)) {
-      setFavorites(favorites.filter((itemId) => itemId !== id))
-    } else {
-      setFavorites([...favorites, id])
-    }
-  }
-
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
       {featuredItems.map((item) => (
@@ -85,19 +72,6 @@ export default function FeaturedItems() {
                   />
                 </div>
               </Link>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute right-2 top-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white/90 dark:bg-black/80 dark:hover:bg-black/90"
-                onClick={() => toggleFavorite(item.id)}
-              >
-                <Heart
-                  className={`h-5 w-5 ${
-                    favorites.includes(item.id) ? "fill-rose-500 text-rose-500" : "text-zinc-600 dark:text-zinc-400"
-                  }`}
-                />
-                <span className="sr-only">Add to favorites</span>
-              </Button>
             </div>
             <div className="p-4">
               <div className="mb-2 flex items-center justify-between">

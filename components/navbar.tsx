@@ -26,6 +26,7 @@ export default function Navbar() {
   const [searchQuery, setSearchQuery] = useState("")
   const [isScrolled, setIsScrolled] = useState(false)
   const [searchResults, setSearchResults] = useState<Array<{ id: string; title: string }>>([])
+  const [trendingItems, setTrendingItems] = useState<Array<{ id: string; title: string }>>([])
   const searchInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
@@ -34,6 +35,21 @@ export default function Navbar() {
     }
     window.addEventListener("scroll", handleScroll)
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const fetchTrending = async () => {
+      try {
+        const response = await fetch('/api/trending-items')
+        const data = await response.json()
+        if (Array.isArray(data)) {
+          setTrendingItems(data)
+        }
+      } catch (error) {
+        console.error('Failed to fetch trending items', error)
+      }
+    }
+    fetchTrending()
   }, [])
 
   useEffect(() => {
@@ -69,6 +85,8 @@ export default function Navbar() {
       const firstResult = searchResults[0]
       if (firstResult) {
         router.push(`/items/${firstResult.id}`)
+        setIsSearchActive(false)
+        setSearchQuery("")
       }
     }
   }
@@ -101,131 +119,107 @@ export default function Navbar() {
           isScrolled ? "" : "",
         )}
       >
+        {/* Decorative Glow */}
+        <div 
+          className="pointer-events-none absolute left-0 top-0 w-full h-full opacity-50"
+          style={{
+            background: 'radial-gradient(ellipse 80% 50% at 50% -20%, rgba(168, 85, 247, 0.15), transparent 80%)',
+          }} 
+        />
+        
         <div className="mx-auto max-w-7xl px-6">
           <div className="flex h-16 items-center justify-between">
             {/* Logo */}
             <Link href="/" className="group relative z-10 flex items-center">
               <span className="relative flex items-center">
-                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 ease-in-out" style={{width: 120, height: 56}}>
+                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out" style={{width: 120, height: 56}}>
                   <span style={{width: '100%', height: '100%', borderRadius: 56, background: 'radial-gradient(circle, rgba(139,92,246,0.7) 0%, rgba(168,85,247,0.35) 100%)', filter: 'blur(24px)'}} />
                 </span>
                 <Image src="/logo.png" alt="Swapp Logo" width={100} height={40} className="transition-all duration-300 group-hover:scale-105" />
               </span>
             </Link>
 
-            {/* Search Bar */}
-            <div className="relative flex-1 max-w-xl mx-12 z-30">
-              {/* Magical Glow */}
-              {isSearchActive && (
-                <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 pointer-events-none" style={{width: 520, height: 120}}>
-                  <div style={{width: '100%', height: '100%', borderRadius: '9999px', background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, rgba(168,85,247,0.15) 100%)', filter: 'blur(32px)'}} />
-                </div>
-              )}
-              <form onSubmit={handleSearchSubmit} className="relative z-30">
+            {/* Search Bar - Revised */}
+            <div className="group relative flex-1 max-w-xl mx-12 z-30">
+              <div
+                className={cn(
+                  "absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300 blur",
+                  isSearchActive ? "opacity-60" : "opacity-0 group-hover:opacity-40"
+                )}
+              />
+              <form onSubmit={handleSearchSubmit} className="relative z-10">
                 <div
                   className={cn(
-                    "relative overflow-visible transition-all duration-500 ease-out z-30",
-                    isSearchActive ? "scale-105" : "scale-100",
+                    "relative transition-all duration-300 ease-out",
+                    isSearchActive ? "scale-105" : "scale-100"
                   )}
                 >
-                  {/* Search Container */}
                   <div
-                    className={cn(
-                      "relative flex items-center w-full rounded-full transition-all duration-500 ease-out cursor-pointer z-30 bg-white px-4 py-2 gap-2 shadow-md border border-violet-100",
-                      isSearchActive
-                        ? "shadow-xl border-violet-200"
-                        : "hover:shadow-lg hover:border-violet-200",
-                    )}
+                    className="relative flex items-center w-full rounded-full bg-black/80 backdrop-blur-sm border border-white/10"
                     onClick={!isSearchActive ? handleSearchClick : undefined}
-                    style={{border: 'none'}}
                   >
-                    {/* Search Icon */}
-                    <div className="flex items-center justify-center w-8 h-8">
-                      <Search
-                        className={cn(
-                          "transition-all duration-500 ease-out text-violet-400",
-                          isSearchActive ? "h-5 w-5 text-violet-600" : "h-4 w-4"
-                        )}
-                      />
+                    <div className="pl-4 pr-2 py-2 flex items-center justify-center">
+                      <Search className="h-5 w-5 text-purple-300" />
                     </div>
-                    {/* Search Input */}
                     <Input
                       ref={searchInputRef}
                       type="text"
-                      placeholder={isSearchActive ? "Search for streetwear, brands, or styles..." : "Search"}
+                      placeholder={isSearchActive ? "Search for anything..." : "Search"}
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onBlur={handleSearchBlur}
-                      className={cn(
-                        "flex-1 bg-white text-violet-900 border-none outline-none shadow-none px-0 py-0 h-10 text-base md:text-sm rounded-none focus:outline-none focus:ring-0 placeholder:text-violet-400",
-                        isSearchActive ? "pr-16" : "pr-4 cursor-pointer"
-                      )}
+                      className="flex-1 bg-transparent text-white border-none outline-none shadow-none p-0 h-10 text-base placeholder:text-white/40 cursor-pointer focus-visible:ring-0 focus-visible:ring-offset-0"
                       readOnly={!isSearchActive}
                     />
-                    {/* Search Submit Button */}
-                    <button
-                      type="submit"
-                      className={cn(
-                        "absolute right-2 top-1/2 -translate-y-1/2 flex items-center justify-center rounded-full bg-white text-violet-700 transition-all duration-500 ease-out outline-none focus:outline-none focus:ring-0 shadow border border-violet-100",
-                        isSearchActive && searchQuery ? "w-8 h-8 opacity-100 scale-100" : "w-0 h-0 opacity-0 scale-0",
-                      )}
-                    >
-                      <ArrowRight className="h-4 w-4" />
-                    </button>
                   </div>
 
-                  {/* Search Suggestions */}
                   {isSearchActive && (
-                    <div className="absolute top-full left-0 right-0 mt-3 bg-gradient-to-br from-white via-violet-50 to-white rounded-2xl border border-violet-100 shadow-2xl shadow-violet-300/30 backdrop-blur-2xl animate-in slide-in-from-top-2 duration-300 z-50 overflow-visible">
-                      <div className="p-6">
+                    <div 
+                      className="absolute top-full left-0 right-0 mt-3 bg-black/80 border border-white/10 rounded-2xl shadow-2xl shadow-purple-500/20 backdrop-blur-xl animate-in slide-in-from-top-2 duration-300 z-50 overflow-hidden"
+                      onMouseDown={(e) => e.preventDefault()}
+                    >
+                      <div className="p-2">
                         {searchQuery.trim() ? (
-                          <div className="mb-4">
-                            <p className="text-xs font-bold text-violet-600 uppercase tracking-wider mb-3">
+                          <div>
+                            <p className="text-xs font-semibold text-purple-300 uppercase tracking-wider mb-1 px-3 pt-2">
                               Search Results
                             </p>
-                            <div className="space-y-1">
+                            <div className="space-y-1 p-1">
                               {searchResults.length > 0 ? (
                                 searchResults.map((result) => (
                                   <button
                                     key={result.id}
-                                    className="group flex items-center w-full px-3 py-2.5 rounded-xl transition-all duration-200 hover:bg-violet-50 hover:shadow-md hover:shadow-violet-200/40"
+                                    type="button"
+                                    className="group flex items-center w-full px-3 py-2 rounded-lg transition-all duration-200 hover:bg-white/10"
                                     onClick={() => handleResultClick(result.id)}
                                   >
-                                    <Search className="h-4 w-4 text-violet-400 mr-3 group-hover:text-violet-600 transition-colors" />
-                                    <span className="text-sm text-black/80 group-hover:text-violet-700 font-medium transition-colors">
+                                    <Search className="h-4 w-4 text-purple-400 mr-3 group-hover:text-purple-300 transition-colors" />
+                                    <span className="text-sm text-white/80 group-hover:text-white font-medium transition-colors">
                                       {result.title}
                                     </span>
                                   </button>
                                 ))
                               ) : (
-                                <p className="text-sm text-gray-500 px-3 py-2">No results found</p>
+                                <p className="text-sm text-white/50 px-3 py-2">No results found.</p>
                               )}
                             </div>
                           </div>
                         ) : (
-                          <div className="mb-4">
-                            <p className="text-xs font-bold text-violet-600 uppercase tracking-wider mb-3">
-                              Trending Searches
+                          <div>
+                            <p className="text-xs font-semibold text-purple-300 uppercase tracking-wider mb-1 px-3 pt-2">
+                              Latest Items
                             </p>
-                            <div className="space-y-1">
-                              {[
-                                "Supreme Box Logo",
-                                "Jordan 1 Chicago",
-                                "Bape Shark Hoodie",
-                                "Off-White Belt",
-                                "Travis Scott Jordan",
-                              ].map((suggestion, index) => (
+                            <div className="space-y-1 p-1">
+                              {trendingItems.map((item) => (
                                 <button
-                                  key={suggestion}
-                                  className="group flex items-center w-full px-3 py-2.5 rounded-xl transition-all duration-200 hover:bg-violet-50 hover:shadow-md hover:shadow-violet-200/40"
-                                  onClick={() => {
-                                    setSearchQuery(suggestion)
-                                    searchInputRef.current?.focus()
-                                  }}
+                                  key={item.id}
+                                  type="button"
+                                  className="group flex items-center w-full px-3 py-2 rounded-lg transition-all duration-200 hover:bg-white/10"
+                                  onClick={() => handleResultClick(item.id)}
                                 >
-                                  <Search className="h-4 w-4 text-violet-400 mr-3 group-hover:text-violet-600 transition-colors" />
-                                  <span className="text-sm text-black/80 group-hover:text-violet-700 font-medium transition-colors">
-                                    {suggestion}
+                                  <Search className="h-4 w-4 text-purple-400 mr-3 group-hover:text-purple-300 transition-colors" />
+                                  <span className="text-sm text-white/80 group-hover:text-white font-medium transition-colors">
+                                    {item.title}
                                   </span>
                                 </button>
                               ))}
