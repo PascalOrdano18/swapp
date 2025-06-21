@@ -5,13 +5,22 @@ import type React from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Search, Plus, User, ArrowRight } from "lucide-react"
+import { Search, Plus, User, ArrowRight, LogOut, Settings } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { cn } from "@/lib/utils"
 import { useRouter } from "next/navigation"
+import { useAuth } from "@/contexts/auth-context"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export default function Navbar() {
   const router = useRouter()
+  const { user, signOut } = useAuth()
   const [isSearchActive, setIsSearchActive] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [isScrolled, setIsScrolled] = useState(false)
@@ -75,6 +84,11 @@ export default function Navbar() {
     router.push(`/items/${itemId}`)
     setIsSearchActive(false)
     setSearchQuery("")
+  }
+
+  const handleSignOut = async () => {
+    await signOut()
+    router.push('/')
   }
 
   return (
@@ -246,17 +260,57 @@ export default function Navbar() {
                 </Button>
               </Link>
 
-              {/* Profile Button */}
-              <Link href="/profile">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="group relative rounded-full w-10 h-10 bg-white text-violet-700 hover:bg-violet-50 transition-all duration-300 hover:scale-110 border border-violet-100"
-                >
-                  <User className="h-5 w-5 text-violet-400 transition-all duration-300 group-hover:text-violet-700 group-hover:scale-110" />
-                  <div className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-100/40 to-violet-200/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                </Button>
-              </Link>
+              {/* Auth Buttons */}
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="group relative rounded-full w-10 h-10 bg-white text-violet-700 hover:bg-violet-50 transition-all duration-300 hover:scale-110 border border-violet-100"
+                    >
+                      <User className="h-5 w-5 text-violet-400 transition-all duration-300 group-hover:text-violet-700 group-hover:scale-110" />
+                      <div className="absolute inset-0 rounded-full bg-gradient-to-r from-violet-100/40 to-violet-200/40 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-56 bg-white/95 backdrop-blur-md border border-violet-100">
+                    <div className="px-3 py-2">
+                      <p className="text-sm font-medium text-violet-900">{user.email}</p>
+                    </div>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profile" className="flex items-center gap-2 cursor-pointer">
+                        <User className="h-4 w-4" />
+                        <span>Mi Perfil</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
+                        <Settings className="h-4 w-4" />
+                        <span>Configuración</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={handleSignOut}
+                      className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      <span>Cerrar Sesión</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Link href="/auth">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="group relative rounded-full bg-white text-violet-700 hover:bg-violet-50 transition-all duration-300 hover:scale-105 border border-violet-100 px-4"
+                  >
+                    <span className="font-medium text-sm">Iniciar Sesión</span>
+                  </Button>
+                </Link>
+              )}
             </div>
           </div>
         </div>
