@@ -23,9 +23,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={inter.className}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <div className="flex min-h-screen flex-col">
+          <div className="flex min-h-screen flex-col bg-black">
             <Navbar />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 bg-black">{children}</main>
             <Footer />
           </div>
         </ThemeProvider>

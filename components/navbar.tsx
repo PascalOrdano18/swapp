@@ -242,7 +242,7 @@ export default function Navbar() {
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-violet-200 to-violet-100 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                   <Plus className="h-4 w-4 mr-2 relative z-10 transition-transform duration-300 group-hover:rotate-180 text-violet-700" />
-                  <span className="relative z-10 font-medium text-sm">Sell</span>
+                  <span className="relative z-10 font-medium text-sm">Vender</span>
                 </Button>
               </Link>
 

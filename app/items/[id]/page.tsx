@@ -33,11 +33,15 @@ const item = {
 
 export default function ItemPage() {
   return (
-    <div className="min-h-screen bg-background flex justify-center items-start py-16 px-4 mt-20">
-      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-16">
+    <div className="min-h-screen bg-black flex justify-center items-start py-16 px-4 mt-20 relative overflow-hidden">
+      {/* Magical background glows */}
+      <div className="pointer-events-none select-none absolute -top-32 left-1/4 w-[520px] h-[420px] z-0" style={{filter: 'blur(90px)', opacity: 0.25, background: 'radial-gradient(circle, #a78bfa 0%, #6366f1 100%)'}} />
+      <div className="pointer-events-none select-none absolute bottom-0 right-1/4 w-[520px] h-[420px] z-0" style={{filter: 'blur(90px)', opacity: 0.25, background: 'radial-gradient(circle, #818cf8 0%, #a21caf 100%)'}} />
+      
+      <div className="w-full max-w-6xl grid grid-cols-1 md:grid-cols-2 gap-16 z-10">
         {/* Left: Images */}
-        <div className="flex flex-col gap-6 items-center">
-          <div className="w-full aspect-square bg-muted rounded-2xl overflow-hidden flex items-center justify-center">
+        <div className="flex flex-col gap-4 items-center">
+          <div className="w-full aspect-square bg-white/10 rounded-2xl overflow-hidden flex items-center justify-center border border-white/20">
             <Image
               src={item.images[0]}
               alt={item.title}
@@ -48,62 +52,62 @@ export default function ItemPage() {
           </div>
           <div className="flex gap-3 w-full justify-center">
             {item.images.slice(1).map((img, i) => (
-              <div key={i} className="w-20 h-20 rounded-xl overflow-hidden border bg-muted flex items-center justify-center">
+              <div key={i} className="w-20 h-20 rounded-xl overflow-hidden border border-white/20 bg-white/10 flex items-center justify-center">
                 <Image src={img} alt={item.title + ' thumb'} width={80} height={80} className="object-cover w-full h-full" />
               </div>
             ))}
           </div>
         </div>
         {/* Right: Info */}
-        <div className="flex flex-col gap-8 justify-start w-full max-w-md mx-auto">
+        <div className="flex flex-col gap-6 justify-start w-full max-w-md mx-auto">
           {/* Brand badge */}
           <div className="flex items-center gap-2">
-            <Badge className="bg-gradient-to-r from-blue-400 to-purple-400 text-white px-3 py-1 text-xs font-medium shadow-none border-none">{item.aiRecommendation}</Badge>
+            <Badge className="bg-gradient-to-r from-blue-400 to-purple-400 text-white px-3 py-1 text-xs font-medium shadow-lg border-none">{item.aiRecommendation}</Badge>
           </div>
           {/* Title & Price */}
           <div>
-            <h1 className="text-3xl font-extrabold text-primary mb-2 leading-tight">{item.title}</h1>
-            <div className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">${item.price}</div>
+            <h1 className="text-3xl font-extrabold text-white mb-2 leading-tight">{item.title}</h1>
+            <div className="text-4xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent mb-4">${item.price}</div>
           </div>
           {/* Key Info */}
           <div className="flex flex-wrap gap-2 mb-2">
-            <span className="rounded bg-secondary/60 px-3 py-1 text-sm font-medium">{item.brand}</span>
-            <span className="rounded bg-secondary/60 px-3 py-1 text-sm font-medium">{item.size}</span>
-            <span className="rounded bg-secondary/60 px-3 py-1 text-sm font-medium">{item.condition}</span>
+            <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1 text-sm font-medium text-white/80">{item.brand}</span>
+            <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1 text-sm font-medium text-white/80">{item.size}</span>
+            <span className="rounded-full bg-white/10 border border-white/20 px-3 py-1 text-sm font-medium text-white/80">{item.condition}</span>
           </div>
           {/* Buttons */}
           <div className="flex gap-3 mb-2">
-            <button className="flex-1 py-2 rounded-full font-bold text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow hover:from-blue-600 hover:to-purple-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400">Buy Now</button>
-            <button className="flex-1 py-2 rounded-full font-semibold text-base border border-primary/20 text-primary bg-transparent hover:bg-primary/10 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-400 flex items-center justify-center gap-2">
+            <button className="flex-1 py-3 rounded-full font-bold text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 focus:ring-offset-black">Buy Now</button>
+            <button className="flex-1 py-3 rounded-full font-semibold text-base border border-white/20 text-white/80 bg-white/10 hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 focus:ring-offset-black flex items-center justify-center gap-2">
               <MessageCircle className="h-5 w-5" /> Message Seller
             </button>
           </div>
           {/* Seller Card */}
-          <div className="flex items-center gap-4 p-4 rounded-xl bg-secondary/60">
-            <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-primary">
+          <div className="flex items-center gap-4 p-4 rounded-xl bg-white/10 border border-white/20">
+            <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-purple-400">
               <Image src={item.seller.avatar} alt={item.seller.username} fill className="object-cover" />
             </div>
             <div className="flex flex-col justify-center">
-              <span className="font-semibold text-primary text-sm">{item.seller.username}</span>
-              <span className="text-xs text-muted-foreground">{item.seller.rating} ★</span>
+              <span className="font-semibold text-white text-sm">{item.seller.username}</span>
+              <span className="text-xs text-white/60">{item.seller.rating} ★</span>
             </div>
           </div>
           {/* Description & Details */}
-          <div className="rounded-2xl p-6 bg-secondary/40">
+          <div className="rounded-2xl p-6 bg-white/10 border border-white/20">
             <Tabs defaultValue="description">
-              <TabsList className="grid w-full grid-cols-2 mb-2 bg-secondary/60 rounded-xl">
-                <TabsTrigger value="description">Description</TabsTrigger>
-                <TabsTrigger value="details">Details</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-2 mb-4 bg-white/5 rounded-xl border border-white/10">
+                <TabsTrigger value="description" className="text-white/70 data-[state=active]:bg-white/10 data-[state=active]:text-white">Description</TabsTrigger>
+                <TabsTrigger value="details" className="text-white/70 data-[state=active]:bg-white/10 data-[state=active]:text-white">Details</TabsTrigger>
               </TabsList>
               <TabsContent value="description" className="mt-2">
-                <p className="text-muted-foreground leading-relaxed text-sm">{item.description}</p>
+                <p className="text-white/70 leading-relaxed text-sm">{item.description}</p>
               </TabsContent>
               <TabsContent value="details" className="mt-2">
-                <div className="space-y-1">
+                <div className="space-y-2">
                   {Object.entries(item.details).map(([key, value]) => (
-                    <div key={key} className="flex justify-between py-1 text-xs border-b border-transparent last:border-none">
-                      <span className="font-medium capitalize text-primary/80">{key}</span>
-                      <span className="text-muted-foreground">{value}</span>
+                    <div key={key} className="flex justify-between py-2 text-sm border-b border-white/10 last:border-none">
+                      <span className="font-medium capitalize text-white/60">{key}</span>
+                      <span className="text-white/90">{value}</span>
                     </div>
                   ))}
                 </div>

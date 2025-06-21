@@ -76,10 +76,10 @@ export default function FeedGrid() {
     <div>
       {/* Sort */}
       <div className="flex justify-between items-center mb-6">
-        <p className="text-gray-600">{items.length} items</p>
+        <p className="text-gray-300">{items.length} items</p>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="outline" size="sm" className="rounded-full">
+            <Button variant="outline" size="sm" className="rounded-full border-white/20 text-white hover:bg-white/10">
               <ArrowUpDown className="h-4 w-4 mr-2" />
               Sort
             </Button>

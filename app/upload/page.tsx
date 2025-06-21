@@ -82,19 +82,23 @@ export default function UploadPage() {
   // Step 1: Photos
   if (step === 1) {
     return (
-      <div className="min-h-screen flex justify-center bg-neutral-100 px-2">
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 md:p-10 relative flex flex-col mt-24">
+        <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden">
+        {/* Magical background glows */}
+        <div className="pointer-events-none select-none absolute -top-32 -left-32 w-[420px] h-[320px] z-0" style={{filter: 'blur(80px)', opacity: 0.35, background: 'radial-gradient(circle, #a78bfa 0%, #6366f1 100%)'}} />
+        <div className="pointer-events-none select-none absolute bottom-0 right-0 w-[420px] h-[320px] z-0" style={{filter: 'blur(80px)', opacity: 0.25, background: 'radial-gradient(circle, #818cf8 0%, #a21caf 100%)'}} />
+        
+        <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-6 md:p-8 border border-white/20 relative flex flex-col">
           <ProgressBar step={1} />
-          <h1 className="text-2xl font-bold text-center mb-2 text-black">Upload Photos</h1>
-          <p className="text-black text-center mb-6">Add up to 4 photos of your item</p>
-          <div className="grid grid-cols-2 gap-4 mb-8">
+          <h1 className="text-2xl font-bold text-center mb-1 text-white">Subir Fotos</h1>
+          <p className="text-white/70 text-center mb-4">Agrega hasta 4 fotos de tu artículo</p>
+          <div className="grid grid-cols-2 gap-3 mb-4">
             {[0, 1, 2, 3].map((i) => (
-              <div key={i} className="aspect-square bg-neutral-50 border-2 border-dashed border-neutral-300 rounded-lg flex items-center justify-center relative overflow-hidden">
+              <div key={i} className="aspect-square bg-white/5 border-2 border-dashed border-white/20 rounded-lg flex items-center justify-center relative overflow-hidden">
                 {photos[i] ? (
                   <>
                     <img src={photos[i] as string} alt="preview" className="object-cover w-full h-full" />
                     <button
-                      className="absolute top-1 right-1 bg-white/80 rounded-full p-1 text-xs text-red-500 hover:bg-white"
+                      className="absolute top-1 right-1 bg-black/50 rounded-full p-1 text-xs text-white hover:bg-black"
                       onClick={() => removePhoto(i)}
                       aria-label="Remove photo"
                     >
@@ -103,12 +107,12 @@ export default function UploadPage() {
                   </>
                 ) : (
                   <button
-                    className="flex flex-col items-center justify-center w-full h-full text-neutral-500 hover:text-blue-600 transition"
+                    className="flex flex-col items-center justify-center w-full h-full text-white/50 hover:text-white transition"
                     onClick={() => fileInputRef.current?.click()}
                     type="button"
                   >
-                    <Upload className="h-7 w-7 mb-1" />
-                    <span className="text-xs text-black">Add Photo</span>
+                    <Upload className="h-6 w-6 mb-1" />
+                    <span className="text-xs">Add Photo</span>
                   </button>
                 )}
               </div>
@@ -123,9 +127,9 @@ export default function UploadPage() {
               disabled={photos.length >= 4}
             />
           </div>
-          <div className="sticky bottom-0 left-0 w-full bg-white pt-4 pb-2 flex justify-end">
+          <div className="mt-auto pt-4">
             <Button
-              className="w-full rounded-full h-11 text-base font-semibold"
+              className="w-full rounded-full h-11 text-base font-semibold bg-white text-black hover:bg-gray-200"
               disabled={photos.length === 0}
               onClick={() => setStep(2)}
             >
@@ -140,21 +144,25 @@ export default function UploadPage() {
   // Step 2: Details
   if (step === 2) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-100 px-2 py-8">
-        <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 md:p-10 relative flex flex-col mt-24">
+        <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden">
+        {/* Magical background glows */}
+        <div className="pointer-events-none select-none absolute -top-32 -left-32 w-[420px] h-[320px] z-0" style={{filter: 'blur(80px)', opacity: 0.35, background: 'radial-gradient(circle, #a78bfa 0%, #6366f1 100%)'}} />
+        <div className="pointer-events-none select-none absolute bottom-0 right-0 w-[420px] h-[320px] z-0" style={{filter: 'blur(80px)', opacity: 0.25, background: 'radial-gradient(circle, #818cf8 0%, #a21caf 100%)'}} />
+
+        <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-6 md:p-8 border border-white/20 relative flex flex-col">
           <ProgressBar step={2} />
-          <h1 className="text-2xl font-bold text-center mb-2 text-black">Item Details</h1>
-          <p className="text-black text-center mb-6">Fill in the details about your item</p>
-          <form className="space-y-5 mb-8">
+          <h1 className="text-2xl font-bold text-center mb-1 text-white">Detalles del Artículo</h1>
+          <p className="text-white/70 text-center mb-4">Rellena los detalles sobre tu artículo</p>
+          <form className="space-y-4 mb-4">
             <div>
-              <Label htmlFor="title" className="text-black font-semibold mb-1">Title</Label>
-              <Input id="title" value={form.title} onChange={handleFormChange} placeholder="e.g. Supreme Box Logo Hoodie" className="bg-white border-neutral-200 text-black" />
+              <Label htmlFor="title" className="text-white/80 font-semibold mb-1 text-sm">Título</Label>
+              <Input id="title" value={form.title} onChange={handleFormChange} placeholder="e.g. Supreme Box Logo Hoodie" className="bg-white/5 border-white/20 text-white placeholder:text-white/40" />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <Label htmlFor="brand" className="text-black font-semibold mb-1">Brand</Label>
+                <Label htmlFor="brand" className="text-white/80 font-semibold mb-1 text-sm">Marca</Label>
                 <Select onValueChange={(v) => handleSelect("brand", v)}>
-                  <SelectTrigger className="bg-white border-neutral-200 text-black">
+                  <SelectTrigger className="bg-white/5 border-white/20 text-white">
                     <SelectValue placeholder="Select brand" />
                   </SelectTrigger>
                   <SelectContent>
@@ -165,34 +173,34 @@ export default function UploadPage() {
                 </Select>
               </div>
               <div>
-                <Label htmlFor="size" className="text-black font-semibold mb-1">Size</Label>
-                <Input id="size" value={form.size} onChange={handleFormChange} placeholder="e.g. L" className="bg-white border-neutral-200 text-black" />
+                <Label htmlFor="size" className="text-white/80 font-semibold mb-1 text-sm">Tamaño</Label>
+                <Input id="size" value={form.size} onChange={handleFormChange} placeholder="e.g. L" className="bg-white/5 border-white/20 text-white placeholder:text-white/40" />
               </div>
             </div>
             <div>
-              <Label htmlFor="condition" className="text-black font-semibold mb-1">Condition</Label>
+              <Label htmlFor="condition" className="text-white/80 font-semibold mb-1 text-sm">Condición</Label>
               <Select onValueChange={(v) => handleSelect("condition", v)}>
-                <SelectTrigger className="bg-white border-neutral-200 text-black">
+                <SelectTrigger className="bg-white/5 border-white/20 text-white">
                   <SelectValue placeholder="Select condition" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="new">New</SelectItem>
-                  <SelectItem value="like-new">Like New</SelectItem>
-                  <SelectItem value="good">Good</SelectItem>
+                  <SelectItem value="new">Nuevo</SelectItem>
+                  <SelectItem value="like-new">Como Nuevo</SelectItem>
+                  <SelectItem value="good">Bueno</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div>
-              <Label htmlFor="description" className="text-black font-semibold mb-1">Description</Label>
-              <Textarea id="description" value={form.description} onChange={handleFormChange} placeholder="Describe your item..." className="bg-white border-neutral-200 min-h-[80px] resize-none text-black" />
+              <Label htmlFor="description" className="text-white/80 font-semibold mb-1 text-sm">Descripción</Label>
+              <Textarea id="description" value={form.description} onChange={handleFormChange} placeholder="Describe tu artículo..." className="bg-white/5 border-white/20 min-h-[80px] resize-none text-white placeholder:text-white/40" />
             </div>
           </form>
-          <div className="sticky bottom-0 left-0 w-full bg-white pt-4 pb-2 flex gap-2">
-            <Button variant="outline" className="rounded-full h-11 w-1/2" onClick={() => setStep(1)}>
+          <div className="mt-auto pt-4 flex gap-2">
+            <Button variant="outline" className="rounded-full h-11 w-1/2 bg-transparent border-white/20 text-white hover:bg-white/10" onClick={() => setStep(1)}>
               Back
             </Button>
             <Button
-              className="rounded-full h-11 w-1/2 text-base font-semibold"
+              className="rounded-full h-11 w-1/2 text-base font-semibold bg-white text-black hover:bg-gray-200"
               disabled={!form.title || !form.brand || !form.size || !form.condition}
               onClick={() => setStep(3)}
             >
@@ -206,16 +214,20 @@ export default function UploadPage() {
 
   // Step 3: Pricing
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-100 px-2 py-8">
-      <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 md:p-10 relative flex flex-col mt-24">
+    <div className="min-h-screen flex items-center justify-center px-4 py-8 relative overflow-hidden">
+        {/* Magical background glows */}
+        <div className="pointer-events-none select-none absolute -top-32 -left-32 w-[420px] h-[320px] z-0" style={{filter: 'blur(80px)', opacity: 0.35, background: 'radial-gradient(circle, #a78bfa 0%, #6366f1 100%)'}} />
+        <div className="pointer-events-none select-none absolute bottom-0 right-0 w-[420px] h-[320px] z-0" style={{filter: 'blur(80px)', opacity: 0.25, background: 'radial-gradient(circle, #818cf8 0%, #a21caf 100%)'}} />
+
+        <div className="w-full max-w-md bg-white/10 backdrop-blur-md rounded-2xl shadow-xl p-6 md:p-8 border border-white/20 relative flex flex-col">
         <ProgressBar step={3} />
-        <h1 className="text-2xl font-bold text-center mb-2 text-black">Set Your Price</h1>
-        <p className="text-black text-center mb-6">Choose your selling speed and get an AI price suggestion</p>
-        <div className="mb-8">
+        <h1 className="text-2xl font-bold text-center mb-1 text-white">Establece tu Precio</h1>
+        <p className="text-white/70 text-center mb-6">Elige tu velocidad de venta y obtén una sugerencia de precio con IA</p>
+        <div className="mb-6">
           <div className="flex justify-between items-center mb-2">
-            <Label className="text-black font-semibold">Selling Speed</Label>
-            <span className="text-xs text-blue-600 font-medium">
-              {sellSpeed < 33 ? "Fast Sale" : sellSpeed < 66 ? "Balanced" : "Max Value"}
+            <Label className="text-white/80 font-semibold text-sm">Velocidad de Venta</Label>
+            <span className="text-xs text-blue-400 font-medium">
+              {sellSpeed < 33 ? "Venta Rápida" : sellSpeed < 66 ? "Equilibrado" : "Valor Máximo"}
             </span>
           </div>
           <Slider
@@ -226,48 +238,48 @@ export default function UploadPage() {
             onValueChange={(value) => setSellSpeed(value[0])}
             className="py-3"
           />
-          <div className="flex justify-between text-xs text-neutral-400 mt-1">
-            <span>Sell Fast</span>
-            <span>Max Value</span>
+          <div className="flex justify-between text-xs text-white/50 mt-1">
+            <span>Vender Rápido</span>
+            <span>Valor Máximo</span>
           </div>
         </div>
         {/* AI Price Recommendation */}
-        <div className="mb-8">
+        <div className="mb-6">
           {!aiPrice && !isGenerating && (
             <div className="text-center">
               <Button
                 onClick={generatePrice}
-                className="rounded-full bg-blue-600 hover:bg-blue-700 h-11 px-8 text-base font-semibold"
+                className="rounded-full bg-blue-600 hover:bg-blue-700 h-11 px-8 text-base font-semibold text-white"
               >
                 <Sparkles className="mr-2 h-5 w-5" />
-                Get AI Price
+                Obtener Precio con IA
               </Button>
             </div>
           )}
           {isGenerating && (
             <div className="text-center animate-pulse">
-              <Sparkles className="mx-auto h-8 w-8 text-blue-600 mb-2" />
-              <div className="text-neutral-500">Analyzing market data...</div>
+              <Sparkles className="mx-auto h-8 w-8 text-blue-400 mb-2" />
+              <div className="text-white/60">Analizando datos del mercado...</div>
             </div>
           )}
           {aiPrice && (
-            <div className="flex flex-col items-center gap-2">
-              <CheckCircle className="h-8 w-8 text-green-500 mb-1" />
-              <div className="text-3xl font-black text-black">${aiPrice}</div>
-              <div className="text-neutral-500 text-sm mb-2">AI recommended price</div>
+            <div className="flex flex-col items-center gap-1">
+              <CheckCircle className="h-8 w-8 text-green-400 mb-1" />
+              <div className="text-3xl font-black text-white">${aiPrice}</div>
+              <div className="text-white/60 text-sm mb-2">Precio recomendado por IA</div>
             </div>
           )}
         </div>
-        <div className="sticky bottom-0 left-0 w-full bg-white pt-4 pb-2 flex gap-2">
-          <Button variant="outline" className="rounded-full h-11 w-1/2" onClick={() => setStep(2)}>
-            Back
+        <div className="mt-auto pt-4 flex gap-2">
+          <Button variant="outline" className="rounded-full h-11 w-1/2 bg-transparent border-white/20 text-white hover:bg-white/10" onClick={() => setStep(2)}>
+            Atrás
           </Button>
           <Button
-            className="rounded-full h-11 w-1/2 text-base font-semibold"
+            className="rounded-full h-11 w-1/2 text-base font-semibold bg-white text-black hover:bg-gray-200"
             disabled={!aiPrice}
-            onClick={() => alert("Listing published!")}
+            onClick={() => alert("¡Anuncio publicado!")}
           >
-            Publish Listing
+            Publicar Anuncio
           </Button>
         </div>
       </div>

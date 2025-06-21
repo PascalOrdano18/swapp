@@ -93,7 +93,7 @@ export default function FeaturedGrid() {
                     : "ring-2 ring-blue-400"
                 }`}
               >
-                {item.aiPrice}
+                {item.aiPrice === "Fast Sell" ? "Venta Rápida" : item.aiPrice === "Hold" ? "Esperar" : "Estándar"}
               </span>
             </div>
             {/* Heart Button */}

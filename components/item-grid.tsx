@@ -205,7 +205,7 @@ export default function ItemGrid() {
                     className="text-xs"
                   >
                     {item.aiRecommendation === "Fast Sell" && <Clock className="mr-1 h-3 w-3" />}
-                    {item.aiRecommendation}
+                    {item.aiRecommendation === "Fast Sell" ? "Venta Rápida" : item.aiRecommendation === "Hold" ? "Esperar" : "Estándar"}
                   </Badge>
                   <span className="text-sm text-muted-foreground">{item.brand}</span>
                 </div>
@@ -222,7 +222,7 @@ export default function ItemGrid() {
             </CardContent>
             <CardFooter className="border-t bg-muted/50 px-4 py-2">
               <p className="text-xs text-muted-foreground">
-                Listed by <span className="font-medium">{item.seller}</span>
+                Listado por <span className="font-medium">{item.seller}</span>
               </p>
             </CardFooter>
           </Card>
