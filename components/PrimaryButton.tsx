@@ -10,15 +10,15 @@ export default function PrimaryButton({ children, className, size = 'lg', ...pro
   const isLarge = size === 'lg';
   
   const glowStyle = {
-    width: isLarge ? 220 : 150,
-    height: isLarge ? 80 : 60,
+    width: isLarge ? 220 : 180,
+    height: isLarge ? 80 : 70,
   };
 
   const glowBackground = isLarge 
     ? 'radial-gradient(circle, rgba(168, 85, 247, 0.7) 0%, rgba(139, 92, 246, 0.3) 100%)'
-    : 'radial-gradient(circle, rgba(168, 85, 247, 0.8) 0%, rgba(139, 92, 246, 0.4) 100%)';
+    : 'radial-gradient(circle, rgba(168, 85, 247, 0.9) 0%, rgba(139, 92, 246, 0.5) 100%)';
   
-  const glowFilter = isLarge ? 'blur(24px)' : 'blur(20px)';
+  const glowFilter = isLarge ? 'blur(24px)' : 'blur(22px)';
 
   const buttonPadding = isLarge ? 'px-8' : 'px-6';
 

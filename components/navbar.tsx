@@ -271,13 +271,6 @@ export default function Navbar() {
                         <span>Mi Perfil</span>
                       </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/settings" className="flex items-center gap-2 cursor-pointer">
-                        <Settings className="h-4 w-4" />
-                        <span>Configuración</span>
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
                     <DropdownMenuItem 
                       onClick={handleSignOut}
                       className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"

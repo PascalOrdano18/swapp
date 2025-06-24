@@ -7,6 +7,9 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { AlertCircle, CheckCircle } from 'lucide-react'
+import { toast } from '@/hooks/use-toast'
+import { useRouter } from 'next/navigation'
+import { FcGoogle } from 'react-icons/fc'
 
 export default function AuthForm() {
   const [email, setEmail] = useState('')
@@ -17,6 +20,7 @@ export default function AuthForm() {
   const [messageType, setMessageType] = useState<'success' | 'error'>('error')
 
   const supabase = createClient()
+  const router = useRouter()
 
   const handleAuth = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,18 +37,44 @@ export default function AuthForm() {
           }
         })
         if (error) throw error
-        setMessageType('success')
-        setMessage('¡Revisa tu email para confirmar tu cuenta!')
+        toast({
+          title: '¡Cuenta creada! 🎉',
+          description: 'Revisa tu email para confirmar tu cuenta.',
+        })
+        setTimeout(() => router.push('/profile'), 500)
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email,
           password
         })
         if (error) throw error
+        toast({
+          title: '¡Bienvenido de vuelta!',
+          description: 'Has iniciado sesión correctamente.',
+        })
+        setTimeout(() => router.push('/profile'), 500)
       }
     } catch (error: any) {
-      setMessageType('error')
-      setMessage(error.message)
+      toast({
+        title: 'Error',
+        description: error.message,
+      })
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleGoogleSignIn = async () => {
+    setLoading(true)
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' })
+      if (error) throw error
+      // The user will be redirected by Supabase after Google sign-in
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message,
+      })
     } finally {
       setLoading(false)
     }
@@ -66,6 +96,22 @@ export default function AuthForm() {
           </CardDescription>
         </CardHeader>
         <CardContent>
+          <div className="flex flex-col gap-4 mb-6">
+            <Button
+              type="button"
+              className="w-full rounded-full h-11 text-base font-semibold bg-white text-black hover:bg-gray-200 flex items-center justify-center gap-2"
+              onClick={handleGoogleSignIn}
+              disabled={loading}
+            >
+              <FcGoogle className="h-5 w-5" />
+              {loading ? 'Cargando...' : 'Continuar con Google'}
+            </Button>
+            <div className="flex items-center gap-2">
+              <span className="flex-1 h-px bg-white/20" />
+              <span className="text-white/60 text-xs">o</span>
+              <span className="flex-1 h-px bg-white/20" />
+            </div>
+          </div>
           <form onSubmit={handleAuth} className="space-y-4">
             <div>
               <Label htmlFor="email" className="text-white/80 font-semibold mb-1 text-sm">Email</Label>
