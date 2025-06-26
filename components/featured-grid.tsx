@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { createClient } from "@/lib/supabase/server"
+import ProductCard from "@/components/ProductCard"
 
 // Re-render this page every time it's visited
 export const revalidate = 0
@@ -77,50 +78,14 @@ export default async function FeaturedGrid() {
   return (
     <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 px-2 md:px-0">
       {items.map((item) => (
-        <div
+        <ProductCard
           key={item.id}
-          className="group relative overflow-hidden rounded-3xl bg-white/30 backdrop-blur-md border border-white/20 shadow-none hover:shadow-lg hover:scale-[1.025] transition-all duration-300 flex flex-col"
-          style={{ minHeight: 380 }}
-        >
-          <div className="relative aspect-[4/5] overflow-hidden flex items-center justify-center">
-            <Link href={`/items/${item.id}`} className="block w-full h-full">
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                className="object-cover transition-transform group-hover:scale-105 rounded-2xl"
-                style={{ borderRadius: 18 }}
-              />
-            </Link>
-            {/* AI Badge */}
-            {item.ai_recommendation && (
-              <div className="absolute top-4 left-4">
-                <span
-                  className={`px-3 py-1 rounded-full text-xs font-semibold shadow-sm bg-white/70 backdrop-blur text-gray-800 border border-white/40 ${
-                    item.ai_recommendation === "Fast Sell"
-                      ? "ring-2 ring-red-400"
-                      : item.ai_recommendation === "Hold"
-                      ? "ring-2 ring-green-400"
-                      : "ring-2 ring-blue-400"
-                  }`}
-                >
-                  {item.ai_recommendation === "Fast Sell" ? "Venta Rápida" : item.ai_recommendation === "Hold" ? "Esperar" : "Estándar"}
-                </span>
-              </div>
-            )}
-          </div>
-          <div className="flex-1 flex flex-col justify-end p-5">
-            <div className="flex items-center justify-between mb-1">
-              <span className="text-xs text-gray-500 font-medium tracking-wide uppercase">{item.brand || 'Unknown Brand'}</span>
-              <span className="text-xl font-extrabold text-gray-900 drop-shadow-sm">${item.price}</span>
-            </div>
-            <Link href={`/items/${item.id}`}>
-              <h3 className="font-semibold text-gray-900 hover:text-blue-600 transition-colors text-lg line-clamp-1 tracking-tight">
-                {item.title}
-              </h3>
-            </Link>
-          </div>
-        </div>
+          id={item.id}
+          image={item.image}
+          title={item.title}
+          price={item.price}
+          href={`/items/${item.id}`}
+        />
       ))}
     </div>
   )

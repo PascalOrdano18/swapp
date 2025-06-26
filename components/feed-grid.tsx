@@ -2,6 +2,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { createClient } from "@/lib/supabase/server"
 import SortDropdown from "./sort-dropdown"
+import ProductCard from "@/components/ProductCard"
 
 // Re-render this page every time it's visited
 export const revalidate = 0
@@ -14,7 +15,7 @@ type Item = {
   brand: string | null;
   ai_recommendation: string | null;
   profiles: {
-    username: string | null;
+    full_name: string | null;
   } | null;
   item_images: {
     image_url: string;
@@ -42,7 +43,7 @@ async function getItems(searchParams: SearchParams) {
       brand,
       ai_recommendation,
       profiles (
-        username
+        full_name
       ),
       item_images (
         image_url,
@@ -103,8 +104,9 @@ async function getItems(searchParams: SearchParams) {
 // To make them persistent, we would need to add state management (or use URL state) and 
 // create a `favorites` table in the database.
 
-export default async function FeedGrid({ searchParams }: { searchParams: SearchParams }) {
-  const items = await getItems(searchParams)
+export default async function FeedGrid({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const params = await searchParams;
+  const items = await getItems(params)
 
   return (
     <div>
@@ -117,53 +119,14 @@ export default async function FeedGrid({ searchParams }: { searchParams: SearchP
       {/* Grid */}
       <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
         {items.map((item) => (
-          <div
+          <ProductCard
             key={item.id}
-            className="group relative overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md hover:shadow-purple-500/10 hover:shadow-2xl hover:border-white/20 transition-all duration-300 break-inside-avoid"
-          >
-            <div className="relative aspect-[4/5] overflow-hidden">
-              <Link href={`/items/${item.id}`}>
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 group-hover:from-black/80 transition-all duration-300" />
-              </Link>
-
-              {/* AI Badge */}
-              {item.ai_recommendation && (
-                <div className="absolute top-4 left-4">
-                  <span
-                    className={`px-3 py-1.5 rounded-full text-xs font-bold text-white shadow-lg backdrop-blur-md ${
-                      item.ai_recommendation === "Fast Sell"
-                        ? "bg-red-500/70"
-                        : item.ai_recommendation === "Hold"
-                          ? "bg-green-500/70"
-                          : "bg-blue-500/70"
-                    }`}
-                  >
-                    {item.ai_recommendation}
-                  </span>
-                </div>
-              )}
-
-            </div>
-
-            <div className="p-5">
-              <div className="flex items-start justify-between mb-2">
-                <span className="text-sm text-white/70 font-medium line-clamp-1">{item.brand}</span>
-                <span className="text-2xl font-bold text-white tracking-tight">${item.price}</span>
-              </div>
-              <Link href={`/items/${item.id}`} className="block mt-[-4px]">
-                <h3 className="font-semibold text-lg text-white hover:text-purple-300 transition-colors line-clamp-2 leading-tight mb-1">
-                  {item.title}
-                </h3>
-              </Link>
-              <p className="text-sm text-white/60">by {item.profiles?.username || 'anonymous'}</p>
-            </div>
-          </div>
+            id={item.id}
+            image={item.image}
+            title={item.title}
+            price={item.price}
+            href={`/items/${item.id}`}
+          />
         ))}
       </div>
     </div>

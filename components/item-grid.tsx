@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge"
 import { Heart, Clock, ArrowUpDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import ProductCard from "@/components/ProductCard"
 
 // Mock data for items
 const items = [
@@ -164,68 +165,17 @@ export default function ItemGrid() {
 
       <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {sortedItems.map((item) => (
-          <Card key={item.id} className="overflow-hidden">
-            <CardContent className="p-0">
-              <div className="relative">
-                <Link href={`/items/${item.id}`}>
-                  <div className="aspect-[3/4] overflow-hidden">
-                    <Image
-                      src={item.image || "/placeholder.svg"}
-                      alt={item.title}
-                      width={300}
-                      height={400}
-                      className="h-full w-full object-cover transition-transform hover:scale-105"
-                    />
-                  </div>
-                </Link>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="absolute right-2 top-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white/90 dark:bg-black/80 dark:hover:bg-black/90"
-                  onClick={() => toggleFavorite(item.id)}
-                >
-                  <Heart
-                    className={`h-5 w-5 ${
-                      favorites.includes(item.id) ? "fill-rose-500 text-rose-500" : "text-zinc-600 dark:text-zinc-400"
-                    }`}
-                  />
-                  <span className="sr-only">Add to favorites</span>
-                </Button>
-              </div>
-              <div className="p-4">
-                <div className="mb-2 flex items-center justify-between">
-                  <Badge
-                    variant={
-                      item.aiRecommendation === "Fast Sell"
-                        ? "destructive"
-                        : item.aiRecommendation === "Hold"
-                          ? "outline"
-                          : "secondary"
-                    }
-                    className="text-xs"
-                  >
-                    {item.aiRecommendation === "Fast Sell" && <Clock className="mr-1 h-3 w-3" />}
-                    {item.aiRecommendation === "Fast Sell" ? "Venta Rápida" : item.aiRecommendation === "Hold" ? "Esperar" : "Estándar"}
-                  </Badge>
-                  <span className="text-sm text-muted-foreground">{item.brand}</span>
-                </div>
-                <Link href={`/items/${item.id}`}>
-                  <h3 className="mb-1 font-medium line-clamp-1">{item.title}</h3>
-                </Link>
-                <div className="flex items-center justify-between">
-                  <p className="font-bold">${item.price}</p>
-                  <p className="text-sm text-muted-foreground">
-                    {item.size} · {item.condition}
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-            <CardFooter className="border-t bg-muted/50 px-4 py-2">
-              <p className="text-xs text-muted-foreground">
-                Listado por <span className="font-medium">{item.seller}</span>
-              </p>
-            </CardFooter>
-          </Card>
+          <ProductCard
+            key={item.id}
+            id={item.id}
+            image={item.image}
+            title={item.title}
+            price={item.price}
+            condition={item.condition}
+            href={`/items/${item.id}`}
+            isFavorite={favorites.includes(item.id)}
+            onFavorite={() => toggleFavorite(item.id)}
+          />
         ))}
       </div>
     </div>

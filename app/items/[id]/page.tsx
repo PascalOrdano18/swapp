@@ -24,7 +24,7 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
     .select(`
       *,
       profiles (
-        username,
+        full_name,
         avatar_url,
         rating
       ),
@@ -83,13 +83,13 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
                 <div className="relative h-12 w-12 overflow-hidden rounded-full border-2 border-purple-400">
                   <Image 
                     src={item.profiles.avatar_url || "/placeholder.svg?height=100&width=100"} 
-                    alt={item.profiles.username || 'Seller Avatar'} 
+                    alt={item.profiles.full_name || 'Seller Avatar'} 
                     fill 
                     className="object-cover" 
                   />
                 </div>
                 <div className="flex flex-col justify-center">
-                  <span className="font-semibold text-white text-sm">{item.profiles.username || 'Anonymous Seller'}</span>
+                  <span className="font-semibold text-white text-sm">{item.profiles.full_name || 'Anonymous Seller'}</span>
                   <span className="text-xs text-white/60">{item.profiles.rating || 0} ★</span>
                 </div>
               </div>

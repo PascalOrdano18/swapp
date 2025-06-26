@@ -148,9 +148,42 @@ export default function UploadPage() {
 
       if (imagesError) throw new Error(`Error saving images: ${imagesError.message}`)
 
+      // 4. Send WhatsApp notification to seller via n8n webhook (if phone number available)
+      // Fetch user profile to get contact information
+      const { data: profileData } = await supabase
+        .from('profiles')
+        .select('contact')
+        .eq('id', user.id)
+        .single()
+
+      const sellerPhone = profileData?.contact || null;
+      if (sellerPhone) {
+        try {
+          await fetch('https://pascalordano.app.n8n.cloud/webhook/product-uploaded', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              contact: sellerPhone,
+              productName: form.title,
+              productPrice: aiPrice,
+              brand: form.brand,
+              condition: form.condition,
+              size: form.size,
+              description: form.description,
+            }),
+          });
+        } catch (n8nError) {
+          // Log but do not block - this is a non-critical feature
+          console.warn('Failed to send WhatsApp notification via n8n:', n8nError);
+        }
+      } else {
+        // TODO: Prompt user to add phone number to profile for WhatsApp notifications
+        console.warn('No seller phone number available for WhatsApp notification.');
+      }
+
       setSubmissionStatus("Success! Redirecting...")
       
-      // 4. Redirect to the new item page
+      // 5. Redirect to the new item page
       router.push(`/items/${newItemId}`)
 
     } catch (error: any) {
