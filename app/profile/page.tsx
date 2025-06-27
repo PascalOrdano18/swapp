@@ -192,11 +192,15 @@ export default function ProfilePage() {
               <div className="p-3 rounded-lg bg-white/5 border border-white/10">
                 <label className="block text-white/60 text-sm mb-1 flex items-center gap-1"><Phone className="h-4 w-4" />Contacto</label>
                 {edit ? (
-                  <input
-                    className="w-full bg-transparent border border-white/20 rounded-lg p-2 text-white"
-                    value={profile.contact || ''}
-                    onChange={e => setProfile(prev => ({ ...prev, contact: e.target.value }))}
-                  />
+                  <div>
+                    <input
+                      className="w-full bg-transparent border border-white/20 rounded-lg p-2 text-white"
+                      value={profile.contact || ''}
+                      onChange={e => setProfile(prev => ({ ...prev, contact: e.target.value }))}
+                      placeholder="+54 11 15-2521-7102"
+                    />
+                    <p className="text-xs text-white/50 mt-1">Ejemplo: +54 11 15-9999-9999</p>
+                  </div>
                 ) : (
                   <p className="text-white/80 text-sm min-h-[24px]">{profile.contact || <span className="text-white/40">Sin contacto</span>}</p>
                 )}
