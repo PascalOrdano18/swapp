@@ -26,7 +26,8 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
       profiles (
         full_name,
         avatar_url,
-        rating
+        rating,
+        contact
       ),
       item_images (
         image_url,
@@ -40,6 +41,27 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
   if (!item) {
     notFound()
   }
+
+  // Function to generate WhatsApp URL
+  const generateWhatsAppUrl = (contact: string, itemTitle: string, itemPrice: number) => {
+    if (!contact) return null
+    
+    // Clean the phone number - remove any non-digit characters except +
+    const cleanedPhone = contact.replace(/[^\d+]/g, '')
+    
+    // Create the message
+    const message = `¡Hola! Estoy interesado en tu artículo "${itemTitle}" por $${itemPrice}. ¿Está disponible?`
+    
+    // Encode the message for URL
+    const encodedMessage = encodeURIComponent(message)
+    
+    // Return WhatsApp URL
+    return `https://wa.me/${cleanedPhone}?text=${encodedMessage}`
+  }
+
+  const whatsappUrl = item.profiles?.contact 
+    ? generateWhatsAppUrl(item.profiles.contact, item.title, item.price)
+    : null
 
   return (
     <div className="min-h-screen bg-black relative overflow-hidden px-4 pt-16">
@@ -59,6 +81,16 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
                 <Badge className="bg-gradient-to-r from-blue-400 to-purple-400 text-white px-3 py-1 text-xs font-medium shadow-lg border-none">{item.ai_recommendation}</Badge>
               </div>
             )}
+            
+            {/* Sold badge if item is sold */}
+            {item.status === 'sold' && (
+              <div className="flex items-center gap-2">
+                <Badge className="bg-gradient-to-r from-red-500 to-red-600 text-white px-4 py-2 text-sm font-bold shadow-lg border-none">
+                  ¡VENDIDO!
+                </Badge>
+              </div>
+            )}
+            
             {/* Title & Price */}
             <div>
               <h1 className="text-3xl font-extrabold text-white mb-2 leading-tight">{item.title}</h1>
@@ -72,10 +104,42 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
             </div>
             {/* Buttons */}
             <div className="flex gap-3 mb-2">
-              <button className="flex-1 py-3 rounded-full font-bold text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 focus:ring-offset-black">Buy Now</button>
-              <button className="flex-1 py-3 rounded-full font-semibold text-base border border-white/20 text-white/80 bg-white/10 hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 focus:ring-offset-black flex items-center justify-center gap-2">
-                <MessageCircle className="h-5 w-5" /> Message Seller
-              </button>
+              {item.status === 'sold' ? (
+                <button 
+                  disabled
+                  className="flex-1 py-3 rounded-full font-bold text-base bg-gray-600 text-gray-300 cursor-not-allowed"
+                >
+                  No Disponible
+                </button>
+              ) : (
+                <button className="flex-1 py-3 rounded-full font-bold text-base bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 focus:ring-offset-black">Buy Now</button>
+              )}
+              {item.status === 'sold' ? (
+                <button 
+                  disabled
+                  className="flex-1 py-3 rounded-full font-semibold text-base border border-gray-600 text-gray-400 bg-gray-800 cursor-not-allowed flex items-center justify-center gap-2"
+                  title="Item already sold"
+                >
+                  <MessageCircle className="h-5 w-5" /> No Disponible
+                </button>
+              ) : whatsappUrl ? (
+                <a 
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 py-3 rounded-full font-semibold text-base border border-white/20 text-white/80 bg-white/10 hover:bg-white/20 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-400 focus:ring-offset-black flex items-center justify-center gap-2"
+                >
+                  <MessageCircle className="h-5 w-5" /> Message Seller
+                </a>
+              ) : (
+                <button 
+                  disabled
+                  className="flex-1 py-3 rounded-full font-semibold text-base border border-white/20 text-white/40 bg-white/5 cursor-not-allowed flex items-center justify-center gap-2"
+                  title="Seller contact not available"
+                >
+                  <MessageCircle className="h-5 w-5" /> Message Seller
+                </button>
+              )}
             </div>
             {/* Seller Card */}
             {item.profiles && (
@@ -92,6 +156,12 @@ export default async function ItemPage({ params }: { params: Promise<{ id: strin
                   <span className="font-semibold text-white text-sm">{item.profiles.full_name || 'Anonymous Seller'}</span>
                   <span className="text-xs text-white/60">{item.profiles.rating || 0} ★</span>
                 </div>
+              </div>
+            )}
+            {/* Contact availability notice */}
+            {!item.profiles?.contact && (
+              <div className="text-center text-xs text-white/50 bg-white/5 border border-white/10 rounded-lg p-3">
+                El vendedor no ha proporcionado información de contacto
               </div>
             )}
             {/* Description & Details */}

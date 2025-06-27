@@ -36,6 +36,7 @@ CREATE TABLE profiles (
   full_name TEXT,
   avatar_url TEXT,
   bio TEXT,
+  contact TEXT,
   rating DECIMAL(3,2) DEFAULT 0,
   total_sales INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -77,7 +78,9 @@ CREATE POLICY "Users can view all profiles" ON profiles FOR SELECT USING (true);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
-CREATE POLICY "Users can view all active items" ON items FOR SELECT USING (status = 'active');
+-- Updated policies for items to allow users to see their own items regardless of status
+CREATE POLICY "Users can view active items from others" ON items FOR SELECT USING (status = 'active' AND auth.uid() != seller_id);
+CREATE POLICY "Users can view all own items" ON items FOR SELECT USING (auth.uid() = seller_id);
 CREATE POLICY "Users can insert own items" ON items FOR INSERT WITH CHECK (auth.uid() = seller_id);
 CREATE POLICY "Users can update own items" ON items FOR UPDATE USING (auth.uid() = seller_id);
 CREATE POLICY "Users can delete own items" ON items FOR DELETE USING (auth.uid() = seller_id);
@@ -118,4 +121,4 @@ CREATE POLICY "Users can insert item images" ON item_images FOR INSERT WITH CHEC
 2. Implement user profile creation on sign up
 3. Connect the upload form to save items to the database
 4. Add real-time features for live updates
-5. Implement image upload to Supabase Storage 
+5. Implement image upload to Supabase Storage

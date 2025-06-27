@@ -9,6 +9,7 @@ export async function GET() {
   const { data: items, error } = await supabase
     .from('items')
     .select('id, title')
+    .eq('status', 'active')
     .order('created_at', { ascending: false })
     .limit(5)
 

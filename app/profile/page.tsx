@@ -3,16 +3,49 @@
 import { useAuth } from "@/contexts/auth-context"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { User, Mail, Calendar, Image as ImageIcon, Phone } from "lucide-react"
+import PrimaryButton from "@/components/PrimaryButton"
+import { UserStatsCards } from "@/components/user-stats-cards"
+import { User, Mail, Calendar, Image as ImageIcon, Phone, TrendingUp, DollarSign, Package, Clock, BarChart3 } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar"
 import { createClient } from "@/lib/supabase/client"
+import { Badge } from "@/components/ui/badge"
+import { LoadingSpinner } from "@/components/ui/loading-spinner"
+
+type UserStats = {
+  soldCount: number
+  activeCount: number
+  totalSalesValue: number
+  averagePrice: number
+  recentItems: Array<{
+    id: string
+    title: string
+    price: number
+    status: string
+    created_at: string
+  }>
+  topItems: Array<{
+    id: string
+    title: string
+    price: number
+    status: string
+  }>
+  statusBreakdown: Record<string, number>
+}
 
 export default function ProfilePage() {
   const { user } = useAuth()
   const router = useRouter()
-  const [stats, setStats] = useState({ soldCount: 0, activeCount: 0 })
+  const [stats, setStats] = useState<UserStats>({
+    soldCount: 0,
+    activeCount: 0,
+    totalSalesValue: 0,
+    averagePrice: 0,
+    recentItems: [],
+    topItems: [],
+    statusBreakdown: {}
+  })
   const [loading, setLoading] = useState(false)
   const [profile, setProfile] = useState({ full_name: '', contact: '', avatar_url: '', bio: '' })
   const [edit, setEdit] = useState(false)
@@ -25,11 +58,14 @@ export default function ProfilePage() {
   useEffect(() => {
     if (!user) return
     setLoading(true)
-    // Fetch stats
+    // Fetch enhanced stats
     fetch("/api/user-stats", { headers: { "user-id": user.id } })
       .then(res => res.json())
       .then(data => {
-        setStats({ soldCount: data.soldCount || 0, activeCount: data.activeCount || 0 })
+        setStats(data)
+      })
+      .catch(error => {
+        console.error('Error fetching stats:', error)
       })
     // Fetch profile
     const fetchProfile = async () => {
@@ -101,19 +137,33 @@ export default function ProfilePage() {
     setLocalAvatarPreview(null)
   }
 
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'active':
+        return <Badge className="bg-green-500/20 text-green-400 border-green-500/30 text-xs">Activo</Badge>
+      case 'sold':
+        return <Badge className="bg-blue-500/20 text-blue-400 border-blue-500/30 text-xs">Vendido</Badge>
+      case 'pending':
+        return <Badge className="bg-yellow-500/20 text-yellow-400 border-yellow-500/30 text-xs">Pendiente</Badge>
+      default:
+        return <Badge variant="secondary" className="text-xs">{status}</Badge>
+    }
+  }
+
   return (
     <div className="min-h-screen py-10 mt-20 relative overflow-hidden">
       {/* Magical background glows */}
       <div className="pointer-events-none select-none absolute -top-32 left-1/4 w-[520px] h-[420px] z-0" style={{filter: 'blur(90px)', opacity: 0.25, background: 'radial-gradient(circle, #a78bfa 0%, #6366f1 100%)'}} />
       <div className="pointer-events-none select-none absolute bottom-0 right-1/4 w-[520px] h-[420px] z-0" style={{filter: 'blur(90px)', opacity: 0.25, background: 'radial-gradient(circle, #818cf8 0%, #a21caf 100%)'}} />
-      <div className="max-w-4xl mx-auto px-4 relative z-10">
+      <div className="max-w-6xl mx-auto px-4 relative z-10">
         <div className="text-center mb-10">
           <h1 className="text-4xl font-bold text-white mb-2">Mi Perfil</h1>
           <p className="text-gray-300">Gestiona tu cuenta y preferencias</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Profile Info */}
-          <Card className="bg-white/10 backdrop-blur-md border border-white/20">
+          <Card className="bg-white/10 backdrop-blur-md border border-white/20 lg:col-span-1">
             <CardHeader>
               <CardTitle className="text-white flex items-center gap-2">
                 <User className="h-5 w-5" />
@@ -149,7 +199,7 @@ export default function ProfilePage() {
                 </div>
                 <div>
                   <p className="text-sm text-white/60">Email</p>
-                  <p className="text-white font-medium">{user.email || 'Sin email'}</p>
+                  <p className="text-white font-medium truncate max-w-[180px] sm:max-w-[240px] md:max-w-[320px] lg:max-w-[400px]" title={user.email || 'Sin email'}>{user.email || 'Sin email'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
@@ -174,7 +224,7 @@ export default function ProfilePage() {
                     onChange={e => setProfile(prev => ({ ...prev, full_name: e.target.value }))}
                   />
                 ) : (
-                  <p className="text-white/80 text-sm min-h-[24px]">{profile.full_name || <span className="text-white/40">Sin nombre</span>}</p>
+                  <p className="text-white/80 text-sm min-h-[24px] truncate max-w-[240px]" title={profile.full_name}>{profile.full_name || <span className="text-white/40">Sin nombre</span>}</p>
                 )}
               </div>
               <div className="p-3 rounded-lg bg-white/5 border border-white/10">
@@ -186,7 +236,7 @@ export default function ProfilePage() {
                     onChange={e => setProfile(prev => ({ ...prev, bio: e.target.value }))}
                   />
                 ) : (
-                  <p className="text-white/80 text-sm min-h-[24px]">{profile.bio || <span className="text-white/40">Sin bio</span>}</p>
+                  <p className="text-white/80 text-sm min-h-[24px] truncate max-w-[240px]" title={profile.bio}>{profile.bio || <span className="text-white/40">Sin bio</span>}</p>
                 )}
               </div>
               <div className="p-3 rounded-lg bg-white/5 border border-white/10">
@@ -202,45 +252,133 @@ export default function ProfilePage() {
                     <p className="text-xs text-white/50 mt-1">Ejemplo: +54 11 15-9999-9999</p>
                   </div>
                 ) : (
-                  <p className="text-white/80 text-sm min-h-[24px]">{profile.contact || <span className="text-white/40">Sin contacto</span>}</p>
+                  <p className="text-white/80 text-sm min-h-[24px] truncate max-w-[240px]" title={profile.contact}>{profile.contact || <span className="text-white/40">Sin contacto</span>}</p>
                 )}
               </div>
               <div className="flex gap-2 mt-2">
                 {edit ? (
                   <>
-                    <Button className="bg-violet-600 hover:bg-violet-700" onClick={handleSave} disabled={saving}>{saving ? 'Guardando...' : 'Guardar'}</Button>
+                    <PrimaryButton onClick={handleSave} disabled={saving}>{saving ? 'Guardando...' : 'Guardar'}</PrimaryButton>
                     <Button variant="outline" onClick={() => { setEdit(false); setAvatarFile(null); }}>Cancelar</Button>
                   </>
                 ) : (
-                  <Button className="bg-violet-600 hover:bg-violet-700" onClick={() => setEdit(true)}>Editar Perfil</Button>
+                  <PrimaryButton onClick={() => setEdit(true)}>Editar Perfil</PrimaryButton>
                 )}
               </div>
             </CardContent>
           </Card>
-          {/* Stats */}
-          <Card className="bg-white/10 backdrop-blur-md border border-white/20">
-            <CardHeader>
-              <CardTitle className="text-white">Estadísticas</CardTitle>
-              <CardDescription className="text-white/70">
-                Tu actividad en SWAPP
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center p-4 rounded-lg bg-white/5 border border-white/10">
-                  <p className="text-2xl font-bold text-white">{loading ? '...' : stats.soldCount}</p>
-                  <p className="text-sm text-white/60">Artículos Vendidos</p>
+
+          {/* Enhanced Stats and Insights */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* Key Stats */}
+            <Card className="bg-white/10 backdrop-blur-md border border-white/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <BarChart3 className="h-5 w-5" />
+                  Estadísticas Principales
+                </CardTitle>
+                <CardDescription className="text-white/70">
+                  Tu actividad en SWAPP
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <UserStatsCards stats={stats} loading={loading} />
+                <div className="mt-4">
+                  <PrimaryButton 
+                    className="w-full" 
+                    onClick={() => router.push('/profile/my-items')}
+                  >
+                    Gestionar Mis Artículos
+                  </PrimaryButton>
                 </div>
-                <div className="text-center p-4 rounded-lg bg-white/5 border border-white/10">
-                  <p className="text-2xl font-bold text-white">{loading ? '...' : stats.activeCount}</p>
-                  <p className="text-sm text-white/60">Artículos Activos</p>
-                </div>
-              </div>
-              <Button className="w-full rounded-full bg-white text-black hover:bg-gray-200" onClick={() => router.push('/feed?mine=1')}>
-                Ver Mis Artículos
-              </Button>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
+
+            {/* Recent Activity */}
+            <Card className="bg-white/10 backdrop-blur-md border border-white/20">
+              <CardHeader>
+                <CardTitle className="text-white flex items-center gap-2">
+                  <Clock className="h-5 w-5" />
+                  Actividad Reciente
+                </CardTitle>
+                <CardDescription className="text-white/70">
+                  Tus últimos artículos
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                {loading ? (
+                  <LoadingSpinner size={24} text="Cargando actividad..." />
+                ) : stats.recentItems.length === 0 ? (
+                  <div className="text-center py-8">
+                    <Package className="h-12 w-12 text-white/40 mx-auto mb-4" />
+                    <p className="text-white/60">Aún no tienes artículos</p>
+                    <PrimaryButton 
+                      className="mt-4"
+                      onClick={() => router.push('/upload')}
+                    >
+                      Subir Primer Artículo
+                    </PrimaryButton>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {stats.recentItems.slice(0, 5).map((item) => (
+                      <div key={item.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/10">
+                        <div className="flex-1">
+                          <p className="text-white font-medium truncate">{item.title}</p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <span className="text-sm text-white/60">
+                              {new Date(item.created_at).toLocaleDateString('es-ES')}
+                            </span>
+                            {getStatusBadge(item.status)}
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            ${item.price}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Top Performing Items */}
+            {stats.topItems.length > 0 && (
+              <Card className="bg-white/10 backdrop-blur-md border border-white/20">
+                <CardHeader>
+                  <CardTitle className="text-white flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Artículos Destacados
+                  </CardTitle>
+                  <CardDescription className="text-white/70">
+                    Tus artículos con mayor valor
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    {stats.topItems.map((item, index) => (
+                      <div key={item.id} className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 flex items-center justify-center text-white font-bold text-sm">
+                          {index + 1}
+                        </div>
+                        <div className="flex-1">
+                          <p className="text-white font-medium truncate">{item.title}</p>
+                          <p className="text-sm text-white/60">Artículo activo</p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-lg font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                            ${item.price}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         </div>
       </div>
     </div>

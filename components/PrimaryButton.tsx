@@ -23,9 +23,9 @@ export default function PrimaryButton({ children, className, size = 'lg', ...pro
   const buttonPadding = isLarge ? 'px-8' : 'px-6';
 
   return (
-    <div className="relative group">
+    <div className="relative group isolate">
       <div 
-        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" 
+        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" 
         style={glowStyle}
       >
         <div style={{width: '100%', height: '100%', borderRadius: '9999px', background: glowBackground, filter: glowFilter}} />
@@ -33,7 +33,7 @@ export default function PrimaryButton({ children, className, size = 'lg', ...pro
       <Button 
         size={size} 
         className={cn(
-          "relative rounded-full bg-white text-black hover:bg-violet-200 hover:scale-105 transition-all duration-300 z-10",
+          "relative rounded-full bg-white text-black hover:bg-violet-200 hover:scale-105 transition-all duration-300 z-0",
           buttonPadding,
           className
         )} 

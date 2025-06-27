@@ -10,10 +10,11 @@ export async function GET(req: NextRequest) {
     return NextResponse.json([])
   }
 
-  // Search for items where title or brand matches the query
+  // Search for items where title or brand matches the query AND item is active
   const { data, error } = await supabase
     .from('items')
     .select('id, title')
+    .eq('status', 'active')
     .or(`title.ilike.%${q}%,brand.ilike.%${q}%`)
     .limit(10)
 
@@ -21,5 +22,12 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  return NextResponse.json(data)
+  const response = NextResponse.json(data)
+  
+  // Add cache control headers to prevent caching
+  response.headers.set('Cache-Control', 'no-cache, no-store, must-revalidate')
+  response.headers.set('Pragma', 'no-cache')
+  response.headers.set('Expires', '0')
+
+  return response
 } 
