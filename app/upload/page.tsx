@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Upload, CheckCircle, Sparkles, Loader2 } from "lucide-react"
+import { Upload, CheckCircle, Sparkles, Loader2, Plus, Package } from "lucide-react"
 import { Slider } from "@/components/ui/slider"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 
@@ -50,7 +50,37 @@ export default function UploadPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submissionStatus, setSubmissionStatus] = useState("")
 
+  // Batch upload state
+  const [uploadedItems, setUploadedItems] = useState<{id: string; title: string; price: number; brand: string; condition: string; photos: File[];}[]>([])
+  const [isBatchMode, setIsBatchMode] = useState(false)
+  const [isSendingToChannel, setIsSendingToChannel] = useState(false)
+
   const fileInputRef = useRef<HTMLInputElement>(null)
+
+  // Send to channel function
+  const sendToChannel = async (itemIds: string[]) => {
+    try {
+      const response = await fetch('/api/send-to-channel', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ itemIds }),
+      })
+
+      if (!response.ok) {
+        const errorData = await response.json()
+        throw new Error(errorData.error || 'Failed to send to channel')
+      }
+
+      const result = await response.json()
+      console.log('Channel send result:', result)
+    } catch (error) {
+      console.error('Error sending to channel:', error)
+      // Don't throw here - we don't want to block the upload process
+      // Just log the error for now
+    }
+  }
 
   // Handle photo upload
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +116,22 @@ export default function UploadPage() {
     }, 1500)
   }
 
-  const handleFinalSubmit = async () => {
+  // Reset form for next item
+  const resetForm = () => {
+    setPhotos([])
+    setForm({
+      title: "",
+      brand: "",
+      size: "",
+      condition: "",
+      description: "",
+    })
+    setAiPrice(null)
+    setSellSpeed(50)
+    setStep(1)
+  }
+
+  const handleFinalSubmit = async (addAnother: boolean = false) => {
     if (!user || photos.length === 0 || !aiPrice) {
       alert("Please complete all steps and ensure you are logged in.")
       return
@@ -148,38 +193,9 @@ export default function UploadPage() {
 
       if (imagesError) throw new Error(`Error saving images: ${imagesError.message}`)
 
-      // 4. Send WhatsApp notification to seller via n8n webhook (if phone number available)
-      // Fetch user profile to get contact information
-      const { data: profileData } = await supabase
-        .from('profiles')
-        .select('contact')
-        .eq('id', user.id)
-        .single()
-
-      const sellerPhone = profileData?.contact || null;
-      if (sellerPhone) {
-        try {
-          await fetch('https://pascalordano.app.n8n.cloud/webhook/product-uploaded', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              contact: sellerPhone,
-              productName: form.title,
-              productPrice: aiPrice,
-              brand: form.brand,
-              condition: form.condition,
-              size: form.size,
-              description: form.description,
-            }),
-          });
-        } catch (n8nError) {
-          // Log but do not block - this is a non-critical feature
-          console.warn('Failed to send WhatsApp notification via n8n:', n8nError);
-        }
-      } else {
-        // TODO: Prompt user to add phone number to profile for WhatsApp notifications
-        console.warn('No seller phone number available for WhatsApp notification.');
-      }
+      // 4. Send to WhatsApp channel
+      setSubmissionStatus("Sending to WhatsApp channel...")
+      await sendToChannel([newItemId])
 
       setSubmissionStatus("Success! Redirecting...")
       
@@ -381,7 +397,7 @@ export default function UploadPage() {
             </Button>
             <Button 
               className="w-1/2 rounded-full h-11 text-base font-semibold bg-white text-black hover:bg-gray-200" 
-              onClick={handleFinalSubmit}
+              onClick={() => handleFinalSubmit(false)}
               disabled={!aiPrice || isSubmitting}
             >
               List Item

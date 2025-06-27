@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import PrimaryButton from "@/components/PrimaryButton"
+import WhatsAppButton from "@/components/WhatsAppButton"
 
 export default function Navbar() {
   const router = useRouter()
@@ -128,19 +129,22 @@ export default function Navbar() {
         />
         
         <div className="mx-auto max-w-7xl px-6">
-          <div className="flex h-16 items-center justify-between">
+          <div className="grid grid-cols-3 h-16 items-center">
             {/* Logo */}
-            <Link href="/" className="group relative z-10 flex items-center">
-              <span className="relative flex items-center">
-                <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out" style={{width: 120, height: 56}}>
-                  <span style={{width: '100%', height: '100%', borderRadius: 56, background: 'radial-gradient(circle, rgba(139,92,246,0.7) 0%, rgba(168,85,247,0.35) 100%)', filter: 'blur(24px)'}} />
+            <div className="flex justify-start">
+              <Link href="/" className="group relative z-10 flex items-center">
+                <span className="relative flex items-center">
+                  <span className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out" style={{width: 120, height: 56}}>
+                    <span style={{width: '100%', height: '100%', borderRadius: 56, background: 'radial-gradient(circle, rgba(139,92,246,0.7) 0%, rgba(168,85,247,0.35) 100%)', filter: 'blur(24px)'}} />
+                  </span>
+                  <Image src="/logo.png" alt="Swapp Logo" width={100} height={40} className="transition-all duration-300 group-hover:scale-105" />
                 </span>
-                <Image src="/logo.png" alt="Swapp Logo" width={100} height={40} className="transition-all duration-300 group-hover:scale-105" />
-              </span>
-            </Link>
+              </Link>
+            </div>
 
-            {/* Search Bar - Revised */}
-            <div className="group relative flex-1 max-w-xl mx-12 z-30">
+            {/* Search Bar - Centered */}
+            <div className="group relative flex justify-center z-30">
+              <div className="w-full max-w-2xl">
               <div
                 className={cn(
                   "absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300 blur",
@@ -231,10 +235,18 @@ export default function Navbar() {
                   )}
                 </div>
               </form>
+              </div>
             </div>
 
             {/* Actions */}
-            <div className="flex items-center gap-4">
+            <div className="flex justify-end items-center gap-4">
+              {/* WhatsApp Button */}
+              <WhatsAppButton 
+                size="sm" 
+                whatsappUrl="https://chat.whatsapp.com/YOUR_ACTUAL_CHANNEL_INVITE_LINK"
+                showIcon={true}
+              />
+              
               {/* Sell Button */}
               <Link href="/upload">
                 <PrimaryButton size="sm">

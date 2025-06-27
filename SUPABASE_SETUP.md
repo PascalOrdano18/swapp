@@ -78,9 +78,9 @@ CREATE POLICY "Users can view all profiles" ON profiles FOR SELECT USING (true);
 CREATE POLICY "Users can update own profile" ON profiles FOR UPDATE USING (auth.uid() = id);
 CREATE POLICY "Users can insert own profile" ON profiles FOR INSERT WITH CHECK (auth.uid() = id);
 
--- Updated policies for items to allow users to see their own items regardless of status
-CREATE POLICY "Users can view active items from others" ON items FOR SELECT USING (status = 'active' AND auth.uid() != seller_id);
-CREATE POLICY "Users can view all own items" ON items FOR SELECT USING (auth.uid() = seller_id);
+-- Updated policies for items to allow anonymous users to see active items and users to see their own items
+CREATE POLICY "Anonymous users can view active items" ON items FOR SELECT USING (status = 'active');
+CREATE POLICY "Users can view own items" ON items FOR SELECT USING (auth.uid() = seller_id);
 CREATE POLICY "Users can insert own items" ON items FOR INSERT WITH CHECK (auth.uid() = seller_id);
 CREATE POLICY "Users can update own items" ON items FOR UPDATE USING (auth.uid() = seller_id);
 CREATE POLICY "Users can delete own items" ON items FOR DELETE USING (auth.uid() = seller_id);

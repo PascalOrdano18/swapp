@@ -78,7 +78,7 @@ export default function Home() {
           <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
             La fijación de precios con IA te ayuda a vender tu streetwear al precio perfecto, exactamente cuando quieres vender.
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-4 items-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8 items-center">
             <Link href="/feed">
               <PrimaryButton>
                 <span className="flex items-center">Explorar<ArrowRight className="ml-2 h-4 w-4" /></span>
@@ -89,7 +89,7 @@ export default function Home() {
                 Vender
               </PrimaryButton>
             </Link>
-          </div>
+                    </div>
         </div>
       </section>
 
