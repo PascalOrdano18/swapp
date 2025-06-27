@@ -197,9 +197,9 @@ export default function ProfilePage() {
                     onChange={handleAvatarChange}
                   />
                 </div>
-                <div>
+                <div className="flex-1 min-w-0">
                   <p className="text-sm text-white/60">Email</p>
-                  <p className="text-white font-medium truncate max-w-[180px] sm:max-w-[240px] md:max-w-[320px] lg:max-w-[400px]" title={user.email || 'Sin email'}>{user.email || 'Sin email'}</p>
+                  <p className="text-white font-medium truncate text-sm" title={user.email || 'Sin email'}>{user.email || 'Sin email'}</p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 rounded-lg bg-white/5 border border-white/10">
