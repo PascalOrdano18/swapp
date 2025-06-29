@@ -2,6 +2,7 @@ import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import FeaturedGrid from "@/components/featured-grid"
 import PrimaryButton from "@/components/PrimaryButton"
+import WhatsAppButton from "@/components/WhatsAppButton"
 
 export default function Home() {
   // Generate random positions for glowing balls on every render
@@ -113,11 +114,19 @@ export default function Home() {
             <p className="text-xl text-gray-300 mb-10 max-w-2xl mx-auto">
               Únete al marketplace de streetwear más inteligente. Vende más rápido con precios de IA.
             </p>
-            <Link href="/upload">
-              <PrimaryButton>
-                Lista tu Primer Artículo
-              </PrimaryButton>
-            </Link>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+              <Link href="/upload">
+                <PrimaryButton>
+                  Lista tu Primer Artículo
+                </PrimaryButton>
+              </Link>
+              <WhatsAppButton 
+                whatsappUrl="https://chat.whatsapp.com/YOUR_ACTUAL_CHANNEL_INVITE_LINK"
+                size="lg"
+              >
+                Comunidad
+              </WhatsAppButton>
+            </div>
           </div>
         </section>
       </div>

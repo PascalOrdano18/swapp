@@ -129,7 +129,7 @@ export default function Navbar() {
         />
         
         <div className="mx-auto max-w-7xl px-6">
-          <div className="grid grid-cols-3 h-16 items-center">
+          <div className="grid grid-cols-[1fr_2fr_1fr] h-16 items-center gap-4">
             {/* Logo */}
             <div className="flex justify-start">
               <Link href="/" className="group relative z-10 flex items-center">
@@ -144,7 +144,7 @@ export default function Navbar() {
 
             {/* Search Bar - Centered */}
             <div className="group relative flex justify-center z-30">
-              <div className="w-full max-w-2xl">
+              <div className="w-full">
               <div
                 className={cn(
                   "absolute -inset-1 rounded-full bg-gradient-to-r from-purple-500 to-blue-500 transition-all duration-300 blur",
@@ -162,7 +162,7 @@ export default function Navbar() {
                     className="relative flex items-center w-full rounded-full bg-black/80 backdrop-blur-sm border border-white/10"
                     onClick={!isSearchActive ? handleSearchClick : undefined}
                   >
-                    <div className="pl-4 pr-2 py-2 flex items-center justify-center">
+                    <div className="pl-6 pr-3 py-3 flex items-center justify-center">
                       <Search className="h-5 w-5 text-purple-300" />
                     </div>
                     <Input
@@ -172,7 +172,7 @@ export default function Navbar() {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onBlur={handleSearchBlur}
-                      className="flex-1 bg-transparent text-white border-none outline-none shadow-none p-0 h-10 text-base placeholder:text-white/40 cursor-pointer focus-visible:ring-0 focus-visible:ring-offset-0"
+                      className="flex-1 bg-transparent text-white border-none outline-none shadow-none px-4 py-3 h-12 text-base placeholder:text-white/40 cursor-pointer focus-visible:ring-0 focus-visible:ring-offset-0"
                       readOnly={!isSearchActive}
                     />
                   </div>
